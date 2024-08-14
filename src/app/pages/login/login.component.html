@@ -1,0 +1,72 @@
+<div class="main-content d-flex">
+    <main class="form-signin w-100 m-auto">
+        <div class="d-flex flex-md-row flex-column align-items-center justify-content-evenly">
+            <div class="flex-shrink-0 w-25 w-sm-75">
+                <img class="mb-4" src="images/logo.png" alt="nodo logo" class="w-100">
+            </div>
+            <form class="w-25 w-sm-75" [formGroup]="form" (submit)="login()">
+                <h1 class="h3 mb-3 fw-normal text-center">Inciar sesión</h1>
+
+                <div class="form-floating mb-2">
+                    <input type="text" class="form-control" id="username" placeholder="Usuario"
+                        formControlName="username">
+                    <label for="username">Usuario</label>
+                    @if(username?.invalid && (username?.dirty || username?.touched)) {
+                    <span>Usuario es obligatorio</span>
+                    }
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="password" placeholder="Contraseña"
+                        formControlName="password">
+                    <label for="password">Contraseña</label>
+                    @if(password?.invalid && (password?.dirty || password?.touched)) {
+                    <span>Contraseña es obligatorio</span>
+                    }
+                </div>
+                <a class="cursor-pointer mb-3" data-bs-toggle="modal" data-bs-target="#forgot">Olvide mi contraseña</a>
+                <button class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center" type="submit" [disabled]="loading.login">
+                    Ingresar
+                    @if (loading.login) {
+                        <div class="spinner-border text-light ms-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    }
+                </button>
+                @if(invalidLogin) {
+                <span>Usuario y contraseña incorrectos</span>
+                }
+            </form>
+        </div>
+    </main>
+</div>
+
+<div class="modal fade" id="forgot" data-bs-backdrop="static" data-bs-keyboard="false" data-bs-theme="dark"
+    tabindex="-1" aria-labelledby="forgotLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered text-white">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="forgotLabel">He olvidado mi contraseña</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Si has oldidado tu contraseñas puedes poner tu correo aqui, y validaremos tu correo y te enviaremos
+                    tu nueva contraseña.</p>
+                <div>
+                    <input type="email" class="form-control mb-3" id="forgotEmail" [(ngModel)]="email"
+                        placeholder="Correo electrónico">
+                    @if (invalidEmail) {
+                    <p>El correo proporcionado no es valido para recuperar contraseña</p>
+                    }
+                    <button class="btn btn-light w-100 py-2 d-flex align-items-center justify-content-center" (click)="forgotPassword()" [disabled]="loading.forgotPassword">
+                        Enviar
+                        @if (loading.forgotPassword) {
+                            <div class="spinner-border text-secondary ms-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

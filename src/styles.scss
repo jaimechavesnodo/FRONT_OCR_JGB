@@ -1,1 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
+.section-container {
+    width: 50%;
+    height: calc(100vh - 58px);
+    padding: 25px;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.table-dark {
+    background-color: #292929;
+}
+
+.overflow-auto {
+    overflow: auto;
+}
+
+@media (max-width: 576px) {
+    .w-sm-25 {
+        width: 25% !important;
+    }
+    .w-sm-75 {
+        width: 75% !important;
+    }
+}

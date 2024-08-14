@@ -1,0 +1,7 @@
+.content-img {
+    height: 100%;
+}
+
+.content-pinch {
+    height: calc(100vh - 105px) !important;
+}

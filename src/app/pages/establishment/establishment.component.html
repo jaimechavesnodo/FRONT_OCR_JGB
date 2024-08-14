@@ -1,0 +1,105 @@
+<app-header />
+
+<main class="w-100 d-flex">
+    <section class="section-container overflow-auto">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <th>Nit</th>
+                <th>Nombre</th>
+                <th>Ciudad</th>
+                <th>Acciones</th>
+            </thead>
+            <tbody>
+                @for(item of itemsTable; track item.id) {
+                <tr>
+                    <td>{{ item.nit }}</td>
+                    <td>{{ item.nameStore }}</td>
+                    <td>{{ item.city }}</td>
+                    <td>
+                        <a class="cursor-pointer" (click)="delete(item.id)">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </section>
+    <section class="section-container d-flex justify-content-center ">
+        <div class="w-100 d-flex align-items-center flex-column">
+            <h1 class="text-center">Creación de establecimientos</h1>
+            <form class="w-75" [formGroup]="form">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="nit" placeholder="Nit" formControlName="nit">
+                    <label for="nit">Nit</label>
+                    @if(nit?.invalid && (nit?.dirty || nit?.touched)) {
+                    <span>Nit es obligatorio</span>
+                    }
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="name" placeholder="Nombre" formControlName="name">
+                    <label for="name">Nombre</label>
+                    @if(name?.invalid && (name?.dirty || name?.touched)) {
+                    <span>Nombre es obligatorio</span>
+                    }
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="city" placeholder="Ciudad" formControlName="city">
+                    <label for="city">Ciudad</label>
+                    @if(city?.invalid && (city?.dirty || city?.touched)) {
+                    <span>Ciudad es obligatorio</span>
+                    }
+                </div>
+                <a class="btn btn-success w-100 py-2 d-flex align-items-center justify-content-center mb-3"
+                    data-bs-toggle="modal" data-bs-target="#create">
+                    Aprobar
+                </a>
+            </form>
+        </div>
+    </section>
+</main>
+
+<div class="modal fade" id="create" data-bs-backdrop="static" data-bs-keyboard="false" data-bs-theme="dark"
+    tabindex="-1" aria-labelledby="createLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered text-white">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="createLabel">Creacion de establecimiento</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>A continuacion se lista la información del establecimiento a crear, verifica esta información y
+                    luego presiona el boton 'Aceptar' para confirmar la valides de la misma.</p>
+                <div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td>Nit</td>
+                                    <td>{{ this.nit?.value }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Establecimiento</td>
+                                    <td>{{ this.name?.value }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Ciudad</td>
+                                    <td>{{ this.city?.value }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-light w-100 py-2 d-flex align-items-center justify-content-center"
+                        data-bs-dismiss="modal" aria-label="Close" (click)="sendForm()" [disabled]="loading.create">
+                        Aceptar
+                        @if (loading.create) {
+                        <div class="spinner-border text-secondary ms-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
