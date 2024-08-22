@@ -47,15 +47,18 @@ export class LoginComponent implements OnInit {
     if (this.form.valid) {
       console.log(this.form.value);
       this.loading.login = true;
-      this.loginService.login(this.form.value).subscribe((response: any) => {
-        console.log(response);
-        this.loading.login = false;
-        localStorage.setItem('user', JSON.stringify(response.data));
-        this.router.navigate(['/home']);
-      }, err => {
-        this.alertsService.error('Credenciales incorrectas', 'El usuario y/o contraseña son incorreacto, intentelo de nuevo.')
-        this.loading.login = false;
-      })
+      this.loginService.login(this.form.value).subscribe({
+        next: (response: any) => {
+          console.log(response);
+          this.loading.login = false;
+          localStorage.setItem('user', JSON.stringify(response.data));
+          this.router.navigate(['/home']);
+        },
+        error: (err) => {
+          this.alertsService.error('Credenciales incorrectas', 'El usuario y/o contraseña son incorrectos, inténtelo de nuevo.');
+          this.loading.login = false;
+        }
+      });
     }
   }
 
@@ -63,10 +66,19 @@ export class LoginComponent implements OnInit {
     if (this.email) {
       this.invalidEmail = false;
       this.loading.forgotPassword = true;
-      this.loginService.forgotPassword(this.email).subscribe((response: any) => {
-        console.log(response);
-        this.loading.forgotPassword = false;
-      })
+      this.loginService.forgotPassword(this.email).subscribe({
+        next: (response: any) => {
+          console.log(response);
+          this.loading.forgotPassword = false;
+          const closeBtnModal = document.getElementById('forgotClose');
+          closeBtnModal?.click();
+          this.alertsService.success('Éxito', 'Se ha enviado un correo con instrucciones para restablecer su contraseña.');
+        },
+        error: (err) => {
+          this.loading.forgotPassword = false;
+          this.alertsService.error('Error', 'No se ha encontrador el correo enviado, intentelo de nuevo.');
+        }
+      });
     }
   }
   

@@ -3,7 +3,7 @@
 <main class="w-100 d-flex">
     <section class="section-container">
         <pinch-zoom class="content-pinch">
-            <img src="images/image1.jpg" width="60%" />
+            <img src="{{ currentClientData?.invoiceUrl }}" width="60%" />
         </pinch-zoom>
     </section>
     <section class="section-container d-flex justify-content-center align-items-center">
@@ -17,23 +17,37 @@
                     }
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="name" placeholder="Establecimiento" formControlName="name">
-                    <label for="name">Establecimiento</label>
+                    <div class="form-floating">
+                        <ng-select formControlName="name">
+                            @for (item of establishments; track item.id) {
+                                <ng-option value="{{item.nit}}">{{item.nit}}</ng-option>
+                            }
+                        </ng-select>
+                        <label for="product">Establecimiento</label>
+                    </div>
                     @if(name?.invalid && (name?.dirty || name?.touched)) {
                     <span>Establecimiento es obligatorio</span>
                     }
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="date" placeholder="Fecha" formControlName="date">
+                    <input type="date" class="form-control" id="date" placeholder="Fecha" formControlName="date">
                     <label for="date">Fecha</label>
                     @if(date?.invalid && (date?.dirty || date?.touched)) {
                     <span>Fecha es obligatorio</span>
                     }
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="product" placeholder="Producto"
-                        formControlName="product">
-                    <label for="product">Producto</label>
+                    <div class="form-floating">
+                        <ng-select formControlName="product">
+                            <ng-option value="Dynamax">Dynamax</ng-option>
+                            <ng-option value="Diesel (ACPM)">Diesel (ACPM)</ng-option>
+                            <ng-option value="Corriente">Corriente</ng-option>
+                            <ng-option value="Extra">Extra</ng-option>
+                            <ng-option value="Uno Lubricantes">Uno Lubricantes</ng-option>
+                        </ng-select>
+                        <label for="product">Producto</label>
+                    </div>
+                    
                     @if(product?.invalid && (product?.dirty || product?.touched)) {
                     <span>Producto es obligatorio</span>
                     }
@@ -53,7 +67,8 @@
                     data-bs-toggle="modal" data-bs-target="#approve">
                     Aprobar
                 </a>
-                <a class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center mb-3" (click)="updateData('nextOne')">
+                <a class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center mb-3"
+                    (click)="updateData('nextOne')">
                     Saltar Factura
                 </a>
             </form>
@@ -68,7 +83,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="rejectLabel">Rechazar</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="rejectClose"></button>
             </div>
             <div class="modal-body">
                 <p>Selecciona el motivo de rechazo por el cual esta factura no aplica a la campaña.</p>
@@ -76,12 +91,12 @@
                     <select class="form-control mb-3" name="rejectOptions" id="rejectOptions"
                         [(ngModel)]="rejectOptions">
                         <option value="" selected disabled>Seleccionar razon rechazo</option>
-                        <option value="1">Establecimiento no participante</option>
-                        <option value="2">Producto no participante</option>
-                        <option value="3">Factura ya registrada</option>
-                        <option value="4">Fuera del periodo de participacion</option>
-                        <option value="5">Foto no legible</option>
-                        <option value="5">Foto incorrecta</option>
+                        <option value="Establecimiento no participante">Establecimiento no participante</option>
+                        <option value="Producto no participante">Producto no participante</option>
+                        <option value="Factura ya registrada">Factura ya registrada</option>
+                        <option value="Fuera del periodo de participacion">Fuera del periodo de participacion</option>
+                        <option value="Foto no legible">Foto no legible</option>
+                        <option value="Foto incorrecta">Foto incorrecta</option>
                     </select>
                     <button class="btn btn-light w-100 py-2 d-flex align-items-center justify-content-center"
                         (click)="updateData('reject')" [disabled]="loading.reject">
@@ -104,7 +119,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="approveLabel">Aceptar</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="approveClose"></button>
             </div>
             <div class="modal-body">
                 <p>A continuacion se lista la información de la factua que estas validando, verifica esta información y
@@ -112,30 +127,30 @@
                 <div>
                     <div class="table-responsive">
                         <table class="table">
-                          <tbody>
-                            <tr>
-                                <td>Nit</td>
-                                <td>{{ this.nit?.value }}</td>
-                            </tr>
-                            <tr>
-                                <td>Establecimiento</td>
-                                <td>{{ this.name?.value }}</td>
-                            </tr>
-                            <tr>
-                                <td>Fecha</td>
-                                <td>{{ this.date?.value }}</td>
-                            </tr>
-                            <tr>
-                                <td>Producto</td>
-                                <td>{{ this.product?.value }}</td>
-                            </tr>
-                            <tr>
-                                <td>Valor</td>
-                                <td>{{ this.value?.value | currency }}</td>
-                            </tr>
-                          </tbody>
+                            <tbody>
+                                <tr>
+                                    <td>Nit</td>
+                                    <td>{{ this.nit?.value }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Establecimiento</td>
+                                    <td>{{ this.name?.value }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Fecha</td>
+                                    <td>{{ this.date?.value }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Producto</td>
+                                    <td>{{ this.product?.value }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Valor</td>
+                                    <td>{{ this.value?.value | currency }}</td>
+                                </tr>
+                            </tbody>
                         </table>
-                      </div>
+                    </div>
                     <button class="btn btn-light w-100 py-2 d-flex align-items-center justify-content-center"
                         (click)="updateData('approve')" [disabled]="loading.approve">
                         Aceptar

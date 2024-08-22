@@ -3,7 +3,10 @@ import { HeaderComponent } from '../../shared/components/header/header.component
 import { PinchZoomModule } from '@meddv/ngx-pinch-zoom';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../shared/services/user.service';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { AlertsService } from '../../shared/services/alerts.service';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { EstablishmentService } from '../../shared/services/establishment.service';
 
 @Component({
   selector: 'app-home',
@@ -13,7 +16,8 @@ import { CurrencyPipe } from '@angular/common';
     ReactiveFormsModule,
     HeaderComponent,
     PinchZoomModule,
-    CurrencyPipe
+    CurrencyPipe,
+    NgSelectModule
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
@@ -23,16 +27,29 @@ export class HomeComponent implements OnInit {
   form!: FormGroup;
   user = JSON.parse(localStorage.getItem('user') || '');
   rejectOptions!: string;
+  establishments: any[] = [];
   loading = {
     reject: false,
     approve: false
   };
   currentClientData: any;
 
-  constructor(private userService: UserService) { }
+  constructor(
+    private userService: UserService,
+    private alertsService: AlertsService,
+    private establishmentService: EstablishmentService
+  ) { }
   ngOnInit(): void {
     this.loadForm();
-    this.getAgentShopping()
+    this.getAgentShopping();
+    this.get();
+  }
+
+  get() {
+    this.establishmentService.get().subscribe((response: any) => {
+      console.log(response)
+      this.establishments = response;
+    })
   }
 
   loadForm(): void {
@@ -52,7 +69,7 @@ export class HomeComponent implements OnInit {
       this.form = new FormGroup({
         nit: new FormControl(response?.nit, Validators.required),
         name: new FormControl(response?.commerce, Validators.required),
-        date: new FormControl(response?.dateInvoice, Validators.required),
+        date: new FormControl(new DatePipe('en-US').transform(response?.dateInvoice, 'yyyy-MM-dd'), Validators.required),
         product: new FormControl(response?.typeProduct, Validators.required),
         value: new FormControl(response?.price, Validators.required),
       });
@@ -60,48 +77,65 @@ export class HomeComponent implements OnInit {
   }
 
   updateData(type: 'approve' | 'reject' | 'nextOne') {
-    console.log(this.prepareData(type));
-    this.userService.updateAgentShopping(this.prepareData(type), this.currentClientData.id).subscribe((response: any) => {
-      console.log(response);
-      this.getAgentShopping();
+    this.userService.updateAgentShopping(this.prepareData(type), this.currentClientData.id).subscribe({
+      next: (response: any) => {
+        console.log(response);
+        const closeBtnModal = document.getElementById(type + 'Close');
+        closeBtnModal?.click();
+        this.alertsService.success('Éxito', this.generateMessage(type));
+        this.getAgentShopping();
+      },
+      error: (err) => {
+        this.alertsService.error('Error', 'No se ha podido actualizar la factura, intentelo de nuevo.');
+      }
     });
   }
 
-
-prepareData(type: 'approve' | 'reject' | 'nextOne'): any {
-  const datas = {
-    'approve': {
-      "idClient": this.currentClientData?.id,
-      "price": this.value?.value,
-      "nit": this.nit?.value,
-      "invoiceUrl": this.currentClientData?.invoiceUrl,
-      "typeProduct": this.product?.value,
-      "invoiceNumber": this.currentClientData?.invoiceNumber,
-      "dateInvoice": this.currentClientData?.dateInvoice,
-      "invoiceRead": 1,
-      "idAgent": this.user?.id,
-      "statusInvoice": 1,
-      "commerce": this.name?.value
-    },
-    'reject': {
-      'idAgent': this.user?.id,
-      'statusInvoice': 2
-    },
-    'nextOne': {
-      'idAgent': null,
-      'date': this.getLastWeek()
+  generateMessage(type: 'approve' | 'reject' | 'nextOne'): string {
+    const messages = {
+      'approve': 'Se ha aprobado la factura con exito.',
+      'reject': 'Se ha rechazado la factura con exito.',
+      'nextOne': 'Se ha saltado la factura con exito.'
     }
+    return messages[type];
   }
-  return datas[type];
-}
+
+  prepareData(type: 'approve' | 'reject' | 'nextOne'): any {
+    const datas = {
+      'approve': {
+        "idClient": this.currentClientData?.id,
+        "price": this.value?.value,
+        "nit": this.nit?.value,
+        "invoiceUrl": this.currentClientData?.invoiceUrl,
+        "typeProduct": this.product?.value,
+        "invoiceNumber": this.currentClientData?.invoiceNumber,
+        "dateInvoice": this.currentClientData?.dateInvoice,
+        "invoiceRead": 1,
+        "idAgent": this.user?.id,
+        "statusInvoice": 1,
+        "commerce": this.name?.value
+      },
+      'reject': {
+        'idAgent': this.user?.id,
+        'statusInvoice': 1,
+        'reasonReject': this.rejectOptions,
+        'invoiceRead': 1
+      },
+      'nextOne': {
+        'idAgent': null,
+        'date': this.getLastWeek()
+      }
+    }
+    return datas[type];
+  }
 
   getLastWeek() {
     const date = new Date();
-          date.setDate(date.getDate() - 7);
+    date.setDate(date.getDate() - 7);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return `${year}-${month}-${day} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
   }
 
   get nit() { return this.form.get('nit'); }

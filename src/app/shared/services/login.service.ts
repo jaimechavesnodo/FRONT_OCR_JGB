@@ -15,7 +15,7 @@ export class LoginService {
   }
 
   forgotPassword(email: string) {
-    return of([]);
+    return this.http.post(`${environment.apiUrl}/agent/resetPassword`, { email });
   }
 
 }
