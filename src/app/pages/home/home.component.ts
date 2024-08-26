@@ -71,12 +71,19 @@ export class HomeComponent implements OnInit {
       console.log(this.clearNit(response?.nit))
       this.form = new FormGroup({
         nit: new FormControl(response?.nit, Validators.required),
-        name: new FormControl((commerce.length > 0) ? commerce[0].name : response?.commerce, Validators.required),
+        name: new FormControl((commerce.length > 0) ? commerce[0].nameStore : response?.commerce, Validators.required),
         date: new FormControl(this.parseDate(response?.dateInvoice), Validators.required),
         product: new FormControl(response?.typeProduct, Validators.required),
         value: new FormControl(response?.price, Validators.required),
       });
     })
+  }
+
+  setNameStore(nit: string) {
+    const commerce = this.establishments.filter((establishment: any) => establishment.nit === nit) || [];
+    if (commerce.length > 0) {
+      this.form.get('name')?.setValue(commerce[0].nameStore);
+    }
   }
 
   clearNit(nit: string) {

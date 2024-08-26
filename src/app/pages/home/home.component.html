@@ -10,7 +10,7 @@
         <div class="w-100 d-flex justify-content-center">
             <form class="w-75" [formGroup]="form">
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="nit" placeholder="Nit" formControlName="nit">
+                    <input type="text" class="form-control" id="nit" placeholder="Nit" formControlName="nit" (input)="setNameStore(nit?.value)">
                     <label for="nit">Nit</label>
                     @if(nit?.invalid && (nit?.dirty || nit?.touched)) {
                     <span>Nit es obligatorio</span>
@@ -20,7 +20,7 @@
                     <div class="form-floating">
                         <ng-select formControlName="name">
                             @for (item of establishments; track item.id) {
-                                <ng-option value="{{item.nit}}">{{item.nit}}</ng-option>
+                                <ng-option value="{{item.nameStore}}">{{item.nameStore}}</ng-option>
                             }
                         </ng-select>
                         <label for="product">Establecimiento</label>
