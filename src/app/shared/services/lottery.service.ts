@@ -13,4 +13,10 @@ export class LotteryService {
     return this.http.get(`${environment.apiUrl}/client/shoppingClientsByDateRange/${data.startDate}/${data.endDate}/${data.quantity}`);
   }
 
+  downloadExcel(data: any) {
+    return this.http.get(`${environment.apiUrl}/client/downloadShoppingClientsByDateRange/${data.startDate}/${data.endDate}/${data.quantity}`, {
+      responseType: 'blob'
+    });
+  }
+
 }

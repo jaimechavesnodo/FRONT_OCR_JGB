@@ -3,7 +3,7 @@ import { HeaderComponent } from '../../shared/components/header/header.component
 import { PinchZoomModule } from '@meddv/ngx-pinch-zoom';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../shared/services/user.service';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, formatDate } from '@angular/common';
 import { AlertsService } from '../../shared/services/alerts.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { EstablishmentService } from '../../shared/services/establishment.service';
@@ -17,7 +17,8 @@ import { EstablishmentService } from '../../shared/services/establishment.servic
     HeaderComponent,
     PinchZoomModule,
     CurrencyPipe,
-    NgSelectModule
+    NgSelectModule,
+    DatePipe
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
@@ -66,14 +67,30 @@ export class HomeComponent implements OnInit {
     this.userService.getAgentShopping(this.user?.id).subscribe((response: any) => {
       console.log(response);
       this.currentClientData = response;
+      const commerce = this.establishments.filter((establishment: any) => establishment.nit === this.clearNit(response?.nit)) || [];
+      console.log(this.clearNit(response?.nit))
       this.form = new FormGroup({
         nit: new FormControl(response?.nit, Validators.required),
-        name: new FormControl(response?.commerce, Validators.required),
-        date: new FormControl(new DatePipe('en-US').transform(response?.dateInvoice, 'yyyy-MM-dd'), Validators.required),
+        name: new FormControl((commerce.length > 0) ? commerce[0].name : response?.commerce, Validators.required),
+        date: new FormControl(this.parseDate(response?.dateInvoice), Validators.required),
         product: new FormControl(response?.typeProduct, Validators.required),
         value: new FormControl(response?.price, Validators.required),
       });
     })
+  }
+
+  clearNit(nit: string) {
+    const response = nit.split('-')[0].replace(/\./g, '');
+    return response
+  }
+
+  parseDate(dateString: string): string {
+    const parts = dateString.split('/');
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+    return dateString;
   }
 
   updateData(type: 'approve' | 'reject' | 'nextOne') {

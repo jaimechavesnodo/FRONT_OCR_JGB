@@ -17,4 +17,8 @@ export class UserService {
     return this.http.put(`${environment.apiUrl}/client/shoppingClient/${id}`, data);
   }
 
+  getInvoices() {
+    return this.http.get(`${environment.apiUrl}/client/shoppingClients/invoiceRead/count`);
+  }
+
 }

@@ -45,10 +45,25 @@ export class LotteryComponent implements OnInit {
       
       this.resultsArray1 = response.data.slice(0, halfLength);
       this.resultsArray2 = response.data.slice(halfLength);
-
-      console.log('Primera mitad:', this.resultsArray1);
-      console.log('Segunda mitad:', this.resultsArray2);
     })
+  }
+
+  downloadResults() {
+    this.lotteryService.downloadExcel(this.form.value).subscribe(
+      (response: Blob) => {
+        const url = window.URL.createObjectURL(response);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'resultados_sorteo.xlsx';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      },
+      (error) => {
+        console.error('Error al descargar el archivo:', error);
+      }
+    );
   }
 
   get startDate() { return this.form.get('startDate'); }
