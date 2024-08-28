@@ -22,9 +22,9 @@
         </ul>
         @if(user?.typeUser == 1) {
             <span class="navbar-text me-3 p-2 rounded" [ngClass]="{
-                'bg-white text-dark': invoices < 150,
-                'bg-warning text-dark': invoices >= 150 && invoices <= 499,
-                'bg-danger text-white': invoices >= 500
+                'bg-white text-dark': invoices < 240,
+                'bg-warning text-dark': invoices >= 241 && invoices <= 480,
+                'bg-danger text-white': invoices >= 481
             }">
                 {{ invoices }} facturas pendientes
             </span>
