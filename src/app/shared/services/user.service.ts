@@ -21,4 +21,8 @@ export class UserService {
     return this.http.get(`${environment.apiUrl}/client/shoppingClients/invoiceRead/count`);
   }
 
+  updatePoints(data: any) {
+    return this.http.put(`${environment.apiUrl}/client/pointsUpdate`, data);
+  }
+
 }

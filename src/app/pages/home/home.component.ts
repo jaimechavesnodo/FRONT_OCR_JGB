@@ -7,6 +7,7 @@ import { CurrencyPipe, DatePipe, formatDate } from '@angular/common';
 import { AlertsService } from '../../shared/services/alerts.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { EstablishmentService } from '../../shared/services/establishment.service';
+import { InvoiceService } from '../../shared/services/invoice.service';
 
 @Component({
   selector: 'app-home',
@@ -38,7 +39,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private userService: UserService,
     private alertsService: AlertsService,
-    private establishmentService: EstablishmentService
+    private establishmentService: EstablishmentService,
+    private invoiceService: InvoiceService
   ) { }
   ngOnInit(): void {
     this.loadForm();
@@ -106,12 +108,24 @@ export class HomeComponent implements OnInit {
         console.log(response);
         const closeBtnModal = document.getElementById(type + 'Close');
         closeBtnModal?.click();
+        if (type === 'approve') {
+          this.userService.updatePoints({ idClient: this.currentClientData.idClient, purchaseValue: this.value?.value }).subscribe((response: any) => {
+            console.log(response);
+          })
+        }
+        this.getInvoices();
         this.alertsService.success('Éxito', this.generateMessage(type));
         this.getAgentShopping();
       },
       error: (err) => {
         this.alertsService.error('Error', 'No se ha podido actualizar la factura, intentelo de nuevo.');
       }
+    });
+  }
+
+  getInvoices(): void {
+    this.userService.getInvoices().subscribe((response: any) => {
+      this.invoiceService.updateInvoiceValue(response?.count);
     });
   }
 

@@ -2,6 +2,7 @@ import { Component, type OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { NgClass } from '@angular/common';
+import { InvoiceService } from '../../services/invoice.service';
 
 @Component({
   selector: 'app-header',
@@ -18,7 +19,7 @@ export class HeaderComponent implements OnInit {
   invoices = 0;
   user = JSON.parse(localStorage.getItem('user') || '');
 
-  constructor(private router: Router, private userService: UserService) {
+  constructor(private router: Router, private userService: UserService, private invoiceService: InvoiceService) {
     this.getInvoices();
   }
   ngOnInit(): void { }
@@ -30,7 +31,11 @@ export class HeaderComponent implements OnInit {
 
   getInvoices(): void {
     this.userService.getInvoices().subscribe((response: any) => {
-      this.invoices = response?.count;
+      this.invoiceService.updateInvoiceValue(response?.count);
+      this.invoiceService.invoiceValue$.subscribe((res) => {
+        console.log(res);
+        this.invoices = res;
+      })
     });
   }
 
