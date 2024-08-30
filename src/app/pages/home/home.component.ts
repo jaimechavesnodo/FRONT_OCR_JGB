@@ -113,6 +113,12 @@ export class HomeComponent implements OnInit {
             console.log(response);
           })
         }
+
+        if (type === 'reject') {
+          this.userService.rejectInvoice({ idClient: this.currentClientData.idClient, rejectionMessage: this.rejectOptions }).subscribe((response: any) => {
+            console.log(response);
+          })
+        }
         this.getInvoices();
         this.alertsService.success('Éxito', this.generateMessage(type));
         this.getAgentShopping();

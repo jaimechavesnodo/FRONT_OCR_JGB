@@ -25,4 +25,8 @@ export class UserService {
     return this.http.put(`${environment.apiUrl}/client/pointsUpdate`, data);
   }
 
+  rejectInvoice(data: any) {
+    return this.http.post(`${environment.apiUrl}/client/rejectionInvoice`, data);
+  }
+
 }
