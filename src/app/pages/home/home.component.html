@@ -59,6 +59,13 @@
                     <span>Valor es obligatorio</span>
                     }
                 </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="invoiceNumber" placeholder="Valor" formControlName="invoiceNumber">
+                    <label for="invoiceNumber">Numero de factura</label>
+                    @if(invoiceNumber?.invalid && (invoiceNumber?.dirty || invoiceNumber?.touched)) {
+                    <span>Numero de factura es obligatorio</span>
+                    }
+                </div>
                 <a class="btn btn-danger w-100 py-2 d-flex align-items-center justify-content-center mb-3"
                     data-bs-toggle="modal" data-bs-target="#reject">
                     Rechazar

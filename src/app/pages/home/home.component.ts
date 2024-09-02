@@ -62,6 +62,7 @@ export class HomeComponent implements OnInit {
       date: new FormControl('', Validators.required),
       product: new FormControl('', Validators.required),
       value: new FormControl('', Validators.required),
+      invoiceNumber: new FormControl('', Validators.required),
     });
   }
 
@@ -77,6 +78,7 @@ export class HomeComponent implements OnInit {
         date: new FormControl(this.parseDate(response?.dateInvoice), Validators.required),
         product: new FormControl(response?.typeProduct, Validators.required),
         value: new FormControl(response?.price, Validators.required),
+        invoiceNumber: new FormControl(response?.invoiceNumber, Validators.required),
       });
     })
   }
@@ -152,7 +154,7 @@ export class HomeComponent implements OnInit {
         "nit": this.nit?.value,
         "invoiceUrl": this.currentClientData?.invoiceUrl,
         "typeProduct": this.product?.value,
-        "invoiceNumber": this.currentClientData?.invoiceNumber,
+        "invoiceNumber": this.invoiceNumber?.value,
         "dateInvoice": this.currentClientData?.dateInvoice,
         "invoiceRead": 1,
         "idAgent": this.user?.id,
@@ -187,5 +189,6 @@ export class HomeComponent implements OnInit {
   get date() { return this.form.get('date'); }
   get product() { return this.form.get('product'); }
   get value() { return this.form.get('value'); }
+  get invoiceNumber() { return this.form.get('invoiceNumber'); }
 
 }
