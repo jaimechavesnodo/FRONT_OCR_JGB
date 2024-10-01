@@ -54,7 +54,7 @@ export class LotteryComponent implements OnInit {
         const url = window.URL.createObjectURL(response);
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'resultados_sorteo.xlsx';
+        link.download = this.name?.value + '.xlsx';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
