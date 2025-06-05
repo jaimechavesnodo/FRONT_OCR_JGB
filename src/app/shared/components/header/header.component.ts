@@ -33,7 +33,7 @@ export class HeaderComponent implements OnInit {
     this.userService.getInvoices().subscribe((response: any) => {
       this.invoiceService.updateInvoiceValue(response?.count);
       this.invoiceService.invoiceValue$.subscribe((res) => {
-        console.log(res);
+        //console.log(res);
         this.invoices = res;
       })
     });

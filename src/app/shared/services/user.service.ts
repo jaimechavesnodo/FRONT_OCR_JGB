@@ -9,8 +9,10 @@ export class UserService {
 
   constructor(private http: HttpClient) { }
 
-  getAgentShopping(id: string) {
-    return this.http.get(`${environment.apiUrl}/client/handleAgentShoppingClient/${id}`);
+  getAgentShopping(id: number) {
+    return this.http.get(`${environment.apiUrl}/client/handleAgentShoppingClient/${id}`, {
+    responseType: 'text' as 'json' 
+    });
   }
 
   updateAgentShopping(data: any, id: string) {

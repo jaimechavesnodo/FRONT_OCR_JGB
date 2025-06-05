@@ -1,174 +1,354 @@
 <app-header />
 
 <main class="w-100 d-flex">
-    <section class="section-container">
-        <pinch-zoom class="content-pinch">
-            <img src="{{ currentClientData?.invoiceUrl }}" width="60%" />
-        </pinch-zoom>
-    </section>
-    <section class="section-container d-flex justify-content-center align-items-center">
-        <div class="w-100 d-flex justify-content-center">
-            <form class="w-75" [formGroup]="form">
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="nit" placeholder="Nit" formControlName="nit" (input)="setNameStore(nit?.value)">
-                    <label for="nit">Nit</label>
-                    @if(nit?.invalid && (nit?.dirty || nit?.touched)) {
-                    <span>Nit es obligatorio</span>
-                    }
-                </div>
-                <div class="form-floating mb-3">
-                    <div class="form-floating">
-                        <ng-select formControlName="name">
-                            @for (item of establishments; track item.id) {
-                                <ng-option value="{{item.nameStore}}">{{item.nameStore}}</ng-option>
-                            }
-                        </ng-select>
-                        <label for="product">Establecimiento</label>
-                    </div>
-                    @if(name?.invalid && (name?.dirty || name?.touched)) {
-                    <span>Establecimiento es obligatorio</span>
-                    }
-                </div>
-                <div class="form-floating mb-3">
-                    <input type="date" class="form-control" id="date" placeholder="Fecha" formControlName="date">
-                    <label for="date">Fecha</label>
-                    @if(date?.invalid && (date?.dirty || date?.touched)) {
-                    <span>Fecha es obligatorio</span>
-                    }
-                </div>
-                <div class="form-floating mb-3">
-                    <div class="form-floating">
-                        <ng-select formControlName="product">
-                            <ng-option value="Dynamax">Dynamax</ng-option>
-                            <ng-option value="Diesel (ACPM)">Diesel (ACPM)</ng-option>
-                            <ng-option value="Corriente">Corriente</ng-option>
-                            <ng-option value="Extra">Extra</ng-option>
-                            <ng-option value="Uno Lubricantes">Uno Lubricantes</ng-option>
-                        </ng-select>
-                        <label for="product">Producto</label>
-                    </div>
-                    
-                    @if(product?.invalid && (product?.dirty || product?.touched)) {
-                    <span>Producto es obligatorio</span>
-                    }
-                </div>
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="value" placeholder="Valor" formControlName="value">
-                    <label for="value">Valor</label>
-                    @if(value?.invalid && (value?.dirty || value?.touched)) {
-                    <span>Valor es obligatorio</span>
-                    }
-                </div>
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="invoiceNumber" placeholder="Valor" formControlName="invoiceNumber">
-                    <label for="invoiceNumber">Numero de factura</label>
-                    @if(invoiceNumber?.invalid && (invoiceNumber?.dirty || invoiceNumber?.touched)) {
-                    <span>Numero de factura es obligatorio</span>
-                    }
-                </div>
-                <a class="btn btn-danger w-100 py-2 d-flex align-items-center justify-content-center mb-3"
-                    data-bs-toggle="modal" data-bs-target="#reject">
-                    Rechazar
-                </a>
-                <a class="btn btn-success w-100 py-2 d-flex align-items-center justify-content-center mb-3"
-                    data-bs-toggle="modal" data-bs-target="#approve">
-                    Aprobar
-                </a>
-                <a class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center mb-3"
-                    (click)="updateData('nextOne')">
-                    Saltar Factura
-                </a>
-            </form>
+  <section class="section-container">
+    <button class="rotate-button" (click)="rotateImage()">Rotar Imagen</button>
+    <pinch-zoom class="content-pinch">
+      <img
+        [src]="currentClientData?.invoiceUrl"
+        width="60%"
+        [style.transform]="'rotate(' + rotationAngle + 'deg)'"
+        style="transition: transform 0.3s ease"
+      />
+    </pinch-zoom>
+  </section>
+  <section
+    class="section-container d-flex justify-content-center align-items-center"
+  >
+    <div class="w-100 d-flex justify-content-center">
+      <form class="w-75" [formGroup]="form">
+        <div class="form-floating mb-3">
+          <input
+            type="text"
+            class="form-control"
+            id="nit"
+            placeholder="Nit"
+            formControlName="nit"
+            (input)="setNameStore(nit?.value)"
+          />
+          <label for="nit">Nit</label>
+          @if(nit?.invalid && (nit?.dirty || nit?.touched)) {
+          <span>Nit es obligatorio</span>
+          }
         </div>
-    </section>
+        <div class="form-floating mb-3">
+          <div class="form-floating">
+            <ng-select formControlName="name">
+              @for (item of establishments; track item.id) {
+              <ng-option value="{{ item.nameStore }}">{{
+                item.nameStore
+              }}</ng-option>
+              }
+            </ng-select>
+            <label for="product">Establecimiento</label>
+          </div>
+          @if(name?.invalid && (name?.dirty || name?.touched)) {
+          <span>Establecimiento es obligatorio</span>
+          }
+        </div>
+        <div class="form-floating mb-3">
+          <input
+            type="date"
+            class="form-control"
+            id="date"
+            placeholder="Fecha"
+            formControlName="date"
+          />
+          <label for="date">Fecha</label>
+          @if(date?.invalid && (date?.dirty || date?.touched)) {
+          <span>Fecha es obligatorio</span>
+          }
+        </div>
+        <div class="form-floating mb-3">
+          <div class="form-floating">
+            <ng-select formControlName="product">
+              <!-- Productos para motos -->
+              <ng-option value="Mobil 1 Racing™ 4T 10W-40"
+                >Mobil 1 Racing™ 4T 10W-40</ng-option
+              >
+              <ng-option value="Mobil 1 Racing™ 4T 15W-50"
+                >Mobil 1 Racing™ 4T 15W-50</ng-option
+              >
+              <ng-option value="Mobil 1™ V-twin 20W-50"
+                >Mobil 1™ V-twin 20W-50</ng-option
+              >
+              <ng-option value="Mobil Super™ Moto 4T MX 10W-30"
+                >Mobil Super™ Moto 4T MX 10W-30</ng-option
+              >
+              <ng-option value="Mobil Super™ Moto 4T MX 10W-40"
+                >Mobil Super™ Moto 4T MX 10W-40</ng-option
+              >
+              <ng-option value="Mobil Super™ Moto 4T MX 15W-50"
+                >Mobil Super™ Moto 4T MX 15W-50</ng-option
+              >
+              <ng-option value="Mobil Super™ Moto Scooter MX 10W-40"
+                >Mobil Super™ Moto Scooter MX 10W-40</ng-option
+              >
+              <ng-option value="Mobil Outboard™ Plus 2T"
+                >Mobil Outboard™ Plus 2T</ng-option
+              >
+              <ng-option value="Mobil Outboard™ Plus 10W-40 FC-W"
+                >Mobil Outboard™ Plus 10W-40 FC-W</ng-option
+              >
+
+              <!-- Productos de motor para autos -->
+              <ng-option value="Mobil 1™ 0W-20">Mobil 1™ 0W-20</ng-option>
+              <ng-option value="Mobil 1™ 0W-40">Mobil 1™ 0W-40</ng-option>
+              <ng-option value="Mobil 1™ ESP 5W-30"
+                >Mobil 1™ ESP 5W-30</ng-option
+              >
+              <ng-option value="Mobil 1™ 5W-30">Mobil 1™ 5W-30</ng-option>
+              <ng-option value="Mobil Super™ 3000 5W-30"
+                >Mobil Super™ 3000 5W-30</ng-option
+              >
+              <ng-option value="Mobil Super™ 3000 5W-40"
+                >Mobil Super™ 3000 5W-40</ng-option
+              >
+              <ng-option value="Mobil Super™ 2000 5W-20"
+                >Mobil Super™ 2000 5W-20</ng-option
+              >
+              <ng-option value="Mobil Super™ 2000 5W-30"
+                >Mobil Super™ 2000 5W-30</ng-option
+              >
+              <ng-option value="Mobil Super™ 2000 10W-30"
+                >Mobil Super™ 2000 10W-30</ng-option
+              >
+              <ng-option value="Mobil Super™ 2000 10W-40"
+                >Mobil Super™ 2000 10W-40</ng-option
+              >
+              <ng-option value="Mobil Super™ 1000 20W-50"
+                >Mobil Super™ 1000 20W-50</ng-option
+              >
+
+              <!-- Productos para vehículos diésel -->
+              <ng-option value="Mobil Delvac™ MX 15W-40"
+                >Mobil Delvac™ MX 15W-40</ng-option
+              >
+              <ng-option value="Mobil Delvac™ Modern 15W-40 Super Defense V3"
+                >Mobil Delvac™ Modern 15W-40 Super Defense V3</ng-option
+              >
+              <ng-option value="Mobil Delvac™ MX ESP 15W-40"
+                >Mobil Delvac™ MX ESP 15W-40</ng-option
+              >
+              <ng-option value="Mobil Delvac™ ModernTM 15W-40 Full Protection"
+                >Mobil Delvac™ ModernTM 15W-40 Full Protection</ng-option
+              >
+              <ng-option value="Mobil Delvac™ XHP ESP 10W-40"
+                >Mobil Delvac™ XHP ESP 10W-40</ng-option
+              >
+              <ng-option value="Mobil Delvac™ Modern 10W-40 Advanced Protection"
+                >Mobil Delvac™ Modern 10W-40 Advanced Protection</ng-option
+              >
+
+              <!-- Refrigerantes y anticongelantes -->
+              <ng-option
+                value="Mobil Delvac™ Extended Life 50/50 Prediluted Coolant/ Antifreeze"
+                >Mobil Delvac™ Extended Life 50/50 Prediluted Coolant/
+                Antifreeze</ng-option
+              >
+              <ng-option
+                value="Mobil Super™ Extended Life Coolant/ Antifreeze 40/60"
+                >Mobil Super™ Extended Life Coolant/ Antifreeze 40/60</ng-option
+              >
+              <ng-option value="Mobil™ Coolant Corrosion Inhibitor"
+                >Mobil™ Coolant Corrosion Inhibitor</ng-option
+              >
+            </ng-select>
+            <label for="product">Producto</label>
+          </div>
+
+          @if(product?.invalid && (product?.dirty || product?.touched)) {
+          <span>Producto es obligatorio</span>
+          }
+        </div>
+
+        <div class="form-floating mb-3">
+          <input
+            type="text"
+            class="form-control"
+            id="value"
+            placeholder="Valor"
+            formControlName="value"
+          />
+          <label for="value">Valor</label>
+          @if(value?.invalid && (value?.dirty || value?.touched)) {
+          <span>Valor es obligatorio</span>
+          }
+        </div>
+        <div class="form-floating mb-3">
+          <input
+            type="text"
+            class="form-control"
+            id="invoiceNumber"
+            placeholder="Valor"
+            formControlName="invoiceNumber"
+          />
+          <label for="invoiceNumber">Numero de factura</label>
+          @if(invoiceNumber?.invalid && (invoiceNumber?.dirty ||
+          invoiceNumber?.touched)) {
+          <span>Numero de factura es obligatorio</span>
+          }
+        </div>
+        <a
+          class="btn btn-danger w-100 py-2 d-flex align-items-center justify-content-center mb-3"
+          data-bs-toggle="modal"
+          data-bs-target="#reject"
+        >
+          Rechazar
+        </a>
+        <a
+          class="btn btn-success w-100 py-2 d-flex align-items-center justify-content-center mb-3"
+          data-bs-toggle="modal"
+          data-bs-target="#approve"
+        >
+          Aprobar
+        </a>
+        <a
+          class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center mb-3"
+          (click)="updateData('nextOne')"
+        >
+          Saltar Factura
+        </a>
+      </form>
+    </div>
+  </section>
 </main>
 
-
-<div class="modal fade" id="reject" data-bs-backdrop="static" data-bs-keyboard="false" data-bs-theme="dark"
-    tabindex="-1" aria-labelledby="rejectLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered text-white">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="rejectLabel">Rechazar</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="rejectClose"></button>
+<div
+  class="modal fade"
+  id="reject"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  data-bs-theme="dark"
+  tabindex="-1"
+  aria-labelledby="rejectLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered text-white">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="rejectLabel">Rechazar</h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+          id="rejectClose"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Selecciona el motivo de rechazo por el cual esta factura no aplica a
+          la campaña.
+        </p>
+        <div>
+          <select
+            class="form-control mb-3"
+            name="rejectOptions"
+            id="rejectOptions"
+            [(ngModel)]="rejectOptions"
+          >
+            <option value="" selected disabled>
+              Seleccionar razon rechazo
+            </option>
+            <option value="Establecimiento no participante">
+              Establecimiento no participante
+            </option>
+            <option value="Producto no participante">
+              Producto no participante
+            </option>
+            <option value="Factura ya registrada">Factura ya registrada</option>
+            <option value="Fuera del periodo de participacion">
+              Fuera del periodo de participacion
+            </option>
+            <option value="Foto no legible">Foto no legible</option>
+            <option value="Foto incorrecta">Foto incorrecta</option>
+          </select>
+          <button
+            class="btn btn-light w-100 py-2 d-flex align-items-center justify-content-center"
+            (click)="updateData('reject')"
+            [disabled]="loading.reject"
+          >
+            Enviar @if (loading.reject) {
+            <div class="spinner-border text-secondary ms-3" role="status">
+              <span class="visually-hidden">Loading...</span>
             </div>
-            <div class="modal-body">
-                <p>Selecciona el motivo de rechazo por el cual esta factura no aplica a la campaña.</p>
-                <div>
-                    <select class="form-control mb-3" name="rejectOptions" id="rejectOptions"
-                        [(ngModel)]="rejectOptions">
-                        <option value="" selected disabled>Seleccionar razon rechazo</option>
-                        <option value="Establecimiento no participante">Establecimiento no participante</option>
-                        <option value="Producto no participante">Producto no participante</option>
-                        <option value="Factura ya registrada">Factura ya registrada</option>
-                        <option value="Fuera del periodo de participacion">Fuera del periodo de participacion</option>
-                        <option value="Foto no legible">Foto no legible</option>
-                        <option value="Foto incorrecta">Foto incorrecta</option>
-                    </select>
-                    <button class="btn btn-light w-100 py-2 d-flex align-items-center justify-content-center"
-                        (click)="updateData('reject')" [disabled]="loading.reject">
-                        Enviar
-                        @if (loading.reject) {
-                        <div class="spinner-border text-secondary ms-3" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        }
-                    </button>
-                </div>
-            </div>
+            }
+          </button>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
-<div class="modal fade" id="approve" data-bs-backdrop="static" data-bs-keyboard="false" data-bs-theme="dark"
-    tabindex="-1" aria-labelledby="approveLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered text-white">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="approveLabel">Aceptar</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="approveClose"></button>
+<div
+  class="modal fade"
+  id="approve"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  data-bs-theme="dark"
+  tabindex="-1"
+  aria-labelledby="approveLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered text-white">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="approveLabel">Aceptar</h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+          id="approveClose"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          A continuacion se lista la información de la factua que estas
+          validando, verifica esta información y luego presiona el boton
+          'Aceptar' para confirmar la valides de la misma.
+        </p>
+        <div>
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>Nit</td>
+                  <td>{{ this.nit?.value }}</td>
+                </tr>
+                <tr>
+                  <td>Establecimiento</td>
+                  <td>{{ this.name?.value }}</td>
+                </tr>
+                <tr>
+                  <td>Fecha</td>
+                  <td>{{ this.date?.value }}</td>
+                </tr>
+                <tr>
+                  <td>Producto</td>
+                  <td>{{ this.product?.value }}</td>
+                </tr>
+                <tr>
+                  <td>Valor</td>
+                  <td>{{ this.value?.value | currency }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <button
+            class="btn btn-light w-100 py-2 d-flex align-items-center justify-content-center"
+            (click)="updateData('approve')"
+            [disabled]="loading.approve"
+          >
+            Aceptar @if (loading.approve) {
+            <div class="spinner-border text-secondary ms-3" role="status">
+              <span class="visually-hidden">Loading...</span>
             </div>
-            <div class="modal-body">
-                <p>A continuacion se lista la información de la factua que estas validando, verifica esta información y
-                    luego presiona el boton 'Aceptar' para confirmar la valides de la misma.</p>
-                <div>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <td>Nit</td>
-                                    <td>{{ this.nit?.value }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Establecimiento</td>
-                                    <td>{{ this.name?.value }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Fecha</td>
-                                    <td>{{ this.date?.value }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Producto</td>
-                                    <td>{{ this.product?.value }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Valor</td>
-                                    <td>{{ this.value?.value | currency }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <button class="btn btn-light w-100 py-2 d-flex align-items-center justify-content-center"
-                        (click)="updateData('approve')" [disabled]="loading.approve">
-                        Aceptar
-                        @if (loading.approve) {
-                        <div class="spinner-border text-secondary ms-3" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        }
-                    </button>
-                </div>
-            </div>
+            }
+          </button>
         </div>
+      </div>
     </div>
+  </div>
 </div>

@@ -39,13 +39,14 @@ export class EstablishmentComponent implements OnInit {
     this.form = new FormGroup({
       nit: new FormControl('', Validators.required),
       name: new FormControl('', Validators.required),
-      city: new FormControl('', Validators.required)
+      city: new FormControl('', Validators.required),
+      department: new FormControl('', Validators.required)
     });
   }
 
   get() {
     this.establishmentService.get().subscribe((response: any) => {
-      console.log(response)
+      //console.log(response)
       this.itemsTable = response;
     })
   }
@@ -61,7 +62,7 @@ export class EstablishmentComponent implements OnInit {
     if (this.form.valid) {
       this.loading.create = true;
       this.establishmentService.create(this.prepateData()).subscribe((response: any) => {
-        console.log(response)
+        //console.log(response)
         this.alertsService.success('Creacion de establecimiento', 'El establecimiento se creo de manera exitosa')
         this.loading.create = false;
         this.form.reset();
@@ -70,6 +71,7 @@ export class EstablishmentComponent implements OnInit {
         this.alertsService.error('Error creando establecimiento', 'Hubo un error al crear el establecimiento')
         this.loading.create = false;
         console.error(error);
+        //console.log(this.prepateData())
       })
     }
   }
@@ -78,12 +80,14 @@ export class EstablishmentComponent implements OnInit {
     return {
       "nameStore": this.name?.value,
       "nit": this.nit?.value,
-      "city": this.city?.value
+      "city": this.city?.value,
+      "department": this.department?.value
     }
   }
 
   get nit() { return this.form.get('nit'); }
   get name() { return this.form.get('name'); }
   get city() { return this.form.get('city'); }
+  get department() { return this.form.get('department'); }
 
 }

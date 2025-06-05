@@ -38,7 +38,7 @@ export class LotteryComponent implements OnInit {
 
   results() {
     this.lotteryService.getResults(this.form.value).subscribe((response: any) => {
-      console.log(response);
+      //console.log(response);
       // Dividir la respuesta en dos arrays con la misma cantidad de resultados
       this.totalResults = response.totalCount;
       const halfLength = Math.ceil(this.totalResults / 2);

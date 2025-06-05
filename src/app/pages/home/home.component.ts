@@ -46,13 +46,20 @@ export class HomeComponent implements OnInit {
     this.loadForm();
     this.getAgentShopping();
     this.get();
+    this.clean();
   }
 
   get() {
     this.establishmentService.get().subscribe((response: any) => {
-      console.log(response)
+      //console.log(response)
       this.establishments = response;
     })
+  }
+
+  // Limpiar el formulario y los datos actuales
+  clean() {
+    this.currentClientData = null;
+    this.form.reset();
   }
 
   loadForm(): void {
@@ -68,10 +75,11 @@ export class HomeComponent implements OnInit {
 
   getAgentShopping() {
     this.userService.getAgentShopping(this.user?.id).subscribe((response: any) => {
-      console.log(response);
-      this.currentClientData = response;
+    const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
+    this.currentClientData = parsedResponse;
+
       const commerce = this.establishments.filter((establishment: any) => establishment.nit === this.clearNit(response?.nit)) || [];
-      console.log(this.clearNit(response?.nit))
+      //console.log(this.clearNit(response?.nit))
       this.form = new FormGroup({
         nit: new FormControl(response?.nit, Validators.required),
         name: new FormControl((commerce.length > 0) ? commerce[0].nameStore : response?.commerce, Validators.required),
@@ -105,25 +113,30 @@ export class HomeComponent implements OnInit {
   }
 
   updateData(type: 'approve' | 'reject' | 'nextOne') {
+    const payload = this.prepareData(type);
+    //console.log('🔍 Payload enviado a backend:', payload);
+    //console.log('ID del cliente real:', this.currentClientData.idClient);
+
     this.userService.updateAgentShopping(this.prepareData(type), this.currentClientData.id).subscribe({
       next: (response: any) => {
-        console.log(response);
+        //console.log(response);
         const closeBtnModal = document.getElementById(type + 'Close');
         closeBtnModal?.click();
         if (type === 'approve') {
           this.userService.updatePoints({ idClient: this.currentClientData.idClient, purchaseValue: this.value?.value }).subscribe((response: any) => {
-            console.log(response);
+            //console.log(response);
           })
         }
 
         if (type === 'reject') {
           this.userService.rejectInvoice({ idClient: this.currentClientData.idClient, rejectionMessage: this.rejectOptions }).subscribe((response: any) => {
-            console.log(response);
+            //console.log(response);
           })
         }
         this.getInvoices();
         this.alertsService.success('Éxito', this.generateMessage(type));
         this.getAgentShopping();
+        this.clean();
       },
       error: (err) => {
         this.alertsService.error('Error', 'No se ha podido actualizar la factura, intentelo de nuevo.');
@@ -147,9 +160,10 @@ export class HomeComponent implements OnInit {
   }
 
   prepareData(type: 'approve' | 'reject' | 'nextOne'): any {
+    
     const datas = {
       'approve': {
-        "idClient": this.currentClientData?.id,
+        "idClient": this.currentClientData?.idClient,
         "price": this.value?.value,
         "nit": this.nit?.value,
         "invoiceUrl": this.currentClientData?.invoiceUrl,
@@ -190,5 +204,10 @@ export class HomeComponent implements OnInit {
   get product() { return this.form.get('product'); }
   get value() { return this.form.get('value'); }
   get invoiceNumber() { return this.form.get('invoiceNumber'); }
+
+  rotationAngle = 0;
+  rotateImage() {
+  this.rotationAngle = (this.rotationAngle + 90) % 360; // rota 90° en cada clic
+}
 
 }

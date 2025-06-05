@@ -3,5 +3,17 @@
 }
 
 .content-pinch {
-    height: calc(100vh - 105px) !important;
+    height: calc(90vh - 105px) !important;
+}
+
+.rotate-button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.selection-container{
+    justify-content: center;
 }

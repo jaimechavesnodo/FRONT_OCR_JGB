@@ -45,11 +45,11 @@ export class LoginComponent implements OnInit {
 
   login(): void {
     if (this.form.valid) {
-      console.log(this.form.value);
+      //console.log(this.form.value);
       this.loading.login = true;
       this.loginService.login(this.form.value).subscribe({
         next: (response: any) => {
-          console.log(response);
+          //console.log(response);
           this.loading.login = false;
           localStorage.setItem('user', JSON.stringify(response.data));
           this.router.navigate(['/home']);
@@ -68,7 +68,7 @@ export class LoginComponent implements OnInit {
       this.loading.forgotPassword = true;
       this.loginService.forgotPassword(this.email).subscribe({
         next: (response: any) => {
-          console.log(response);
+          //console.log(response);
           this.loading.forgotPassword = false;
           const closeBtnModal = document.getElementById('forgotClose');
           closeBtnModal?.click();

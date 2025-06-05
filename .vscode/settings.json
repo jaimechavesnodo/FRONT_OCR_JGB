@@ -8,5 +8,6 @@
         "angular-*": {
             "externalTemplate": true
         }
-    }
+    },
+    "codetogether.virtualCursorJoin": "sharedVirtualCursor"
 }
