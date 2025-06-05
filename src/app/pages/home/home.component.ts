@@ -9,6 +9,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { EstablishmentService } from '../../shared/services/establishment.service';
 import { InvoiceService } from '../../shared/services/invoice.service';
 
+
 @Component({
   selector: 'app-home',
   standalone: true,
