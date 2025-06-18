@@ -8,12 +8,14 @@ import { AlertsService } from '../../shared/services/alerts.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { EstablishmentService } from '../../shared/services/establishment.service';
 import { InvoiceService } from '../../shared/services/invoice.service';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     HeaderComponent,
@@ -210,5 +212,36 @@ export class HomeComponent implements OnInit {
   rotateImage() {
   this.rotationAngle = (this.rotationAngle + 90) % 360; // rota 90° en cada clic
 }
+
+filteredNits: any[] = [];
+showSuggestions = false;
+
+onNitInput(value: string) {
+  this.filteredNits = this.establishments.filter(est =>
+    est.nit.toLowerCase().includes(value.toLowerCase())
+  );
+  this.showSuggestions = true;
+  if (this.filteredNits.length === 1 && this.filteredNits[0].nit === value) {
+    this.setNameStore(value);
+  }
+}
+
+selectNit(nit: string) {
+  this.form.get('nit')?.setValue(nit);
+  this.setNameStore(nit);
+  this.showSuggestions = false;
+}
+
+hideSuggestionsWithDelay() {
+  setTimeout(() => {
+    this.showSuggestions = false;
+  }, 200);
+}
+handleNitInput(event: Event) {
+  const inputElement = event.target as HTMLInputElement;
+  const value = inputElement?.value || '';
+  this.onNitInput(value);
+}
+
 
 }

@@ -24,9 +24,25 @@
             id="nit"
             placeholder="Nit"
             formControlName="nit"
-            (input)="setNameStore(nit?.value)"
+            (input)="handleNitInput($event)"
+            (blur)="hideSuggestionsWithDelay()"
+            (focus)="onNitInput(nit?.value || '')"
+            autocomplete="off"
           />
           <label for="nit">Nit</label>
+
+          <ul
+            *ngIf="filteredNits.length > 0 && showSuggestions"
+            class="suggestions-list"
+          >
+            <li
+              *ngFor="let item of filteredNits"
+              (mousedown)="selectNit(item.nit)"
+            >
+              {{ item.nit }} - {{ item.nameStore }}
+            </li>
+          </ul>
+
           @if(nit?.invalid && (nit?.dirty || nit?.touched)) {
           <span>Nit es obligatorio</span>
           }

@@ -9,5 +9,9 @@
             "externalTemplate": true
         }
     },
-    "codetogether.virtualCursorJoin": "sharedVirtualCursor"
+    "codetogether.virtualCursorJoin": "sharedVirtualCursor",
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ]
 }
