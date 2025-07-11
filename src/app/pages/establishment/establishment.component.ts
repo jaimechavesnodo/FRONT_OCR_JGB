@@ -70,7 +70,7 @@ export class EstablishmentComponent implements OnInit {
       }, error => {
         this.alertsService.error('Error creando establecimiento', 'Hubo un error al crear el establecimiento')
         this.loading.create = false;
-        console.error(error);
+        //console.error(error);
         //console.log(this.prepateData())
       })
     }

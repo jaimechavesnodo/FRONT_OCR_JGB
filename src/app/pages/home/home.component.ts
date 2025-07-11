@@ -9,6 +9,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { EstablishmentService } from '../../shared/services/establishment.service';
 import { InvoiceService } from '../../shared/services/invoice.service';
 import { CommonModule } from '@angular/common';
+import { FormArray } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 
 
 @Component({
@@ -47,17 +49,15 @@ export class HomeComponent implements OnInit {
   ) { }
   ngOnInit(): void {
     this.loadForm();
-    this.getAgentShopping();
     this.get();
-    this.clean();
   }
 
-  get() {
-    this.establishmentService.get().subscribe((response: any) => {
-      //console.log(response)
-      this.establishments = response;
-    })
-  }
+get() {
+  this.establishmentService.get().subscribe((response: any) => {
+    this.establishments = response;
+    this.getAgentShopping(); // 👈 Ahora se llama aquí, cuando ya hay data
+  });
+}
 
   // Limpiar el formulario y los datos actuales
   clean() {
@@ -65,34 +65,54 @@ export class HomeComponent implements OnInit {
     this.form.reset();
   }
 
-  loadForm(): void {
-    this.form = new FormGroup({
-      nit: new FormControl('', Validators.required),
-      name: new FormControl('', Validators.required),
-      date: new FormControl('', Validators.required),
-      product: new FormControl('', Validators.required),
-      value: new FormControl('', Validators.required),
-      invoiceNumber: new FormControl('', Validators.required),
-    });
-  }
+loadForm(): void {
+  this.form = new FormGroup({
+    nit: new FormControl('', Validators.required),
+    name: new FormControl('', Validators.required),
+    date: new FormControl('', Validators.required),
+    products: new FormArray([new FormControl('', Validators.required)]),
+    value: new FormControl('', Validators.required),
+    invoiceNumber: new FormControl('', Validators.required),
+  });
+}
 
-  getAgentShopping() {
-    this.userService.getAgentShopping(this.user?.id).subscribe((response: any) => {
+getAgentShopping() {
+  this.userService.getAgentShopping(this.user?.id).subscribe((response: any) => {
     const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
+    //console.log('📦 Respuesta de getAgentShopping:', parsedResponse);
     this.currentClientData = parsedResponse;
 
-      const commerce = this.establishments.filter((establishment: any) => establishment.nit === this.clearNit(response?.nit)) || [];
-      //console.log(this.clearNit(response?.nit))
-      this.form = new FormGroup({
-        nit: new FormControl(response?.nit, Validators.required),
-        name: new FormControl((commerce.length > 0) ? commerce[0].nameStore : response?.commerce, Validators.required),
-        date: new FormControl(this.parseDate(response?.dateInvoice), Validators.required),
-        product: new FormControl(response?.typeProduct, Validators.required),
-        value: new FormControl(response?.price, Validators.required),
-        invoiceNumber: new FormControl(response?.invoiceNumber, Validators.required),
-      });
-    })
-  }
+    const nitLimpio = this.clearNit(parsedResponse?.nit);
+
+    const cleanName = (name: string) => name?.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+
+    let comercio = this.establishments.find((est: any) => est.nit === nitLimpio);
+
+    if (!comercio) {
+      comercio = this.establishments.find((est: any) =>
+        cleanName(est.nameStore) === cleanName(parsedResponse?.commerce)
+      );
+    }
+
+    const nombreComercio = comercio?.nameStore || parsedResponse?.commerce;
+    //console.log('🧩 Comercio final asignado:', nombreComercio);
+
+    const productsArray = new FormArray([
+      new FormControl('', Validators.required)
+    ]);
+
+    this.form = new FormGroup({
+      nit: new FormControl(parsedResponse?.nit, Validators.required),
+      name: new FormControl(nombreComercio, Validators.required), // 👈 Aquí aseguramos coincidencia con ng-option
+      date: new FormControl(this.parseDate(parsedResponse?.dateInvoice), Validators.required),
+      products: productsArray,
+      value: new FormControl(parsedResponse?.price, Validators.required),
+      invoiceNumber: new FormControl(parsedResponse?.invoiceNumber, Validators.required),
+    });
+
+    this.onNitInput(parsedResponse?.nit);
+  });
+}
 
   setNameStore(nit: string) {
     const commerce = this.establishments.filter((establishment: any) => establishment.nit === nit) || [];
@@ -166,17 +186,17 @@ export class HomeComponent implements OnInit {
     
     const datas = {
       'approve': {
-        "idClient": this.currentClientData?.idClient,
-        "price": this.value?.value,
-        "nit": this.nit?.value,
-        "invoiceUrl": this.currentClientData?.invoiceUrl,
-        "typeProduct": this.product?.value,
-        "invoiceNumber": this.invoiceNumber?.value,
-        "dateInvoice": this.currentClientData?.dateInvoice,
-        "invoiceRead": 1,
-        "idAgent": this.user?.id,
-        "statusInvoice": 1,
-        "commerce": this.name?.value
+  "idClient": this.currentClientData?.idClient,
+  "price": this.value?.value,
+  "nit": this.nit?.value,
+  "invoiceUrl": this.currentClientData?.invoiceUrl,
+  "typeProduct": this.products.value.join(', '),
+  "invoiceNumber": this.invoiceNumber?.value,
+  "dateInvoice": this.currentClientData?.dateInvoice,
+  "invoiceRead": 1,
+  "idAgent": this.user?.id,
+  "statusInvoice": 1,
+  "commerce": this.name?.value
       },
       'reject': {
         'idAgent': this.user?.id,
@@ -191,6 +211,15 @@ export class HomeComponent implements OnInit {
     }
     return datas[type];
   }
+
+  get products() {
+    return this.form.get('products') as FormArray;
+  }
+
+  asFormControl(ctrl: AbstractControl): FormControl {
+    return ctrl as FormControl;
+  }
+
 
   getLastWeek() {
     const date = new Date();
@@ -241,6 +270,20 @@ handleNitInput(event: Event) {
   const inputElement = event.target as HTMLInputElement;
   const value = inputElement?.value || '';
   this.onNitInput(value);
+}
+
+addProduct() {
+  this.products.push(new FormControl('', Validators.required));
+}
+
+removeProduct(index: number) {
+  if (this.products.length > 1) {
+    this.products.removeAt(index);
+  }
+}
+
+getSelectedProducts(): string {
+  return this.products.controls.map(p => p.value).join(', ');
 }
 
 

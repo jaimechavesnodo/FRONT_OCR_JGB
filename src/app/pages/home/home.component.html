@@ -75,9 +75,16 @@
           <span>Fecha es obligatorio</span>
           }
         </div>
-        <div class="form-floating mb-3">
-          <div class="form-floating">
-            <ng-select formControlName="product">
+
+        <div
+          class="form-floating mb-3"
+          *ngFor="let prodCtrl of products.controls; let i = index"
+        >
+          <div class="d-flex align-items-center">
+            <ng-select
+              [formControl]="asFormControl(prodCtrl)"
+              class="flex-grow-1"
+            >
               <!-- Productos para motos -->
               <ng-option value="Mobil 1 Racing™ 4T 10W-40"
                 >Mobil 1 Racing™ 4T 10W-40</ng-option
@@ -170,12 +177,23 @@
                 >Mobil™ Coolant Corrosion Inhibitor</ng-option
               >
             </ng-select>
-            <label for="product">Producto</label>
+            <button
+              type="button"
+              class="btn btn-secondary ms-2"
+              *ngIf="i === products.length - 1"
+              (click)="addProduct()"
+            >
+              Agregar
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger ms-2"
+              *ngIf="products.length > 1"
+              (click)="removeProduct(i)"
+            >
+              ✖
+            </button>
           </div>
-
-          @if(product?.invalid && (product?.dirty || product?.touched)) {
-          <span>Producto es obligatorio</span>
-          }
         </div>
 
         <div class="form-floating mb-3">
@@ -343,7 +361,7 @@
                 </tr>
                 <tr>
                   <td>Producto</td>
-                  <td>{{ this.product?.value }}</td>
+                  <td>{{ getSelectedProducts() }}</td>
                 </tr>
                 <tr>
                   <td>Valor</td>
