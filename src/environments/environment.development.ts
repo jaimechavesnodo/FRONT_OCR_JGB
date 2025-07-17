@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    apiUrl: 'https://backocrnodo.azurewebsites.net',
+    apiUrl: 'https://backocrjgb-egfggzf0awcbbpha.eastus-01.azurewebsites.net',
 };
