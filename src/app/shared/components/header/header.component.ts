@@ -29,6 +29,10 @@ export class HeaderComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  isCurrentRoute(route: string): boolean {
+  return this.router.url === route;
+  }
+
   getInvoices(): void {
     this.userService.getInvoices().subscribe((response: any) => {
       this.invoiceService.updateInvoiceValue(response?.count);

@@ -3,7 +3,22 @@
 }
 
 .content-pinch {
-    height: calc(90vh - 105px) !important;
+  height: calc(90vh - 105px) !important;
+  border: 13px solid #D9D9D9;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.image-controls .control-icon {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.image-controls .control-icon:hover {
+  transform: scale(1.2);
+  filter: brightness(1.2);
 }
 
 .rotate-button {
@@ -47,4 +62,41 @@
   padding: 10px;
   border-radius: 8px;
   background-color: #f9f9f9;
+}
+
+
+
+.image-wrapper {
+  width: 100%;
+  height: calc(90vh - 100px);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+  position: relative;
+}
+
+.zoomable-image {
+  max-width: 100%;
+  user-select: none;
+  pointer-events: none; /* evita conflictos de eventos */
+}
+
+.image-wrapper:active {
+  cursor: grabbing;
+}
+
+.control-icon {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+/* Ocultar el ícono de zoom visual que agrega <pinch-zoom> */
+
+
+.control-icon:hover {
+  transform: scale(1.2);
 }

@@ -6,7 +6,7 @@
     color: #fff;
 }
 .dropdown-menu {
-    background-color: #f8ed79; /* Dark background for the dropdown */
+    background-color: #9BD7F6; /* Dark background for the dropdown */
 }
 .dropdown-menu .dropdown-item {
     color: #000; /* White text for dropdown items */
@@ -16,6 +16,6 @@
     color: #fff; /* Darker background on hover */
 }
 
-.bg-yellow {
-    background-color: #f8ed79 !important;
+.bg-bluedark {
+    background-color: #9BD7F6 !important;
 }

@@ -1,5 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
 
+// 🎨 Variables de color personalizadas
+:root {
+  --color-bluedark: #1C3D7B;
+}
+
+// 📦 Tamaños de texto personalizados
+.text-xs   { font-size: 0.75rem; }     // 12px
+.text-sm   { font-size: 0.875rem; }    // 14px
+.text-base { font-size: 1rem; }        // 16px
+.text-lg   { font-size: 1.125rem; }    // 18px
+.text-xl   { font-size: 1.25rem; }     // 20px
+.text-2xl  { font-size: 1.5rem; }      // 24px
+.text-3xl  { font-size: 1.875rem; }    // 30px
+.text-4xl  { font-size: 2.25rem; }     // 36px
+
+.text-bluedark {
+  color: #1C3D7B;
+}
 // Estilos personalizados para ng-select
 .ng-select {
   .ng-select-container {
@@ -35,29 +53,50 @@
   transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
 }
 
+// Otros estilos globales
 .section-container {
-    width: 50%;
-    height: calc(100vh - 58px);
-    padding: 25px;
+  width: 50%;
+  height: calc(100vh - 58px);
+  padding: 25px;
 }
 
 .cursor-pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .table-dark {
-    background-color: #292929;
+  background-color: #292929;
 }
 
 .overflow-auto {
-    overflow: auto;
+  overflow: auto;
 }
 
 @media (max-width: 576px) {
-    .w-sm-25 {
-        width: 25% !important;
-    }
-    .w-sm-75 {
-        width: 75% !important;
-    }
+  .w-sm-25 {
+    width: 25% !important;
+  }
+  .w-sm-75 {
+    width: 75% !important;
+  }
+}
+
+// Ejemplo de uso del nuevo color personalizado
+.btn-bluedark {
+  background-color: var(--color-bluedark);
+  color: white;
+  border: none;
+  &:hover {
+    background-color: #162f61; // versión más oscura para hover
+  }
+}
+
+.btn-yellow {
+  background-color: #F8AF2F;
+  color: white;
+  border: none;
+
+  &:hover {
+    background-color: #F8AF2F; // versión más oscura para hover
+  }
 }

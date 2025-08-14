@@ -1,25 +1,35 @@
-<nav class="navbar navbar-expand-lg navbar-yellow bg-yellow">
-    <a class="navbar-brand" href="#">
-        <img src="images/logo.png" alt="Logo" width="150" height="30" class="d-inline-block align-text-top">
+<nav class="navbar navbar-expand-lg navbar-yellow bg-bluedark py-3">
+    <a class="navbar-brand  ms-4" href="#">
+        <img src="images/logo1.png" alt="Logo" width="130" height="30" class="d-inline-block align-text-top">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-                <a class="nav-link" aria-current="page" routerLink="/home">Home</a>
-            </li>
-            @if(user?.typeUser == 1) {
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" routerLink="/establishment">Establecimientos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" routerLink="/lottery">Sorteos</a>
-                </li>
-            }
-        </ul>
+       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+  <li class="nav-item">
+    <a class="nav-link" routerLink="/home" routerLinkActive="fw-bold" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+  </li>
+    @if(user?.typeUser == 1) {
+        <li class="nav-item">
+        <a class="nav-link" routerLink="/establishment" routerLinkActive="fw-bold" [routerLinkActiveOptions]="{ exact: true }">Establecimientos</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" routerLink="/lottery" routerLinkActive="fw-bold" [routerLinkActiveOptions]="{ exact: true }">Sorteos</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" routerLink="/manual" routerLinkActive="fw-bold" [routerLinkActiveOptions]="{ exact: true }">Manual Antifraude</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" routerLink="/faq" routerLinkActive="fw-bold" [routerLinkActiveOptions]="{ exact: true }">Preguntas Frecuentes</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" routerLink="/pqrs" routerLinkActive="fw-bold" [routerLinkActiveOptions]="{ exact: true }">Registro de PQRS</a>
+        </li>
+    }
+    </ul>
+
         <!-- @if(user?.typeUser == 1) {
             <span class="navbar-text me-3 p-2 rounded" [ngClass]="{
                 'bg-white text-dark': invoices < 240,
@@ -29,10 +39,11 @@
                 {{ invoices }} facturas pendientes
             </span>
         } -->
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 me-3">
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                <a class="nav-link dropdown-toggle gap-4" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
                     aria-expanded="false">
+                    <img src="images/persona.png" alt="Avatar" width="30" height="30" class="me-3" />
                     {{ user.name }}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">

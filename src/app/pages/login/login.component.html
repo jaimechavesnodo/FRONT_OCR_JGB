@@ -2,10 +2,10 @@
     <main class="form-signin w-100 m-auto">
         <div class="d-flex flex-md-row flex-column align-items-center justify-content-evenly">
             <div class="flex-shrink-0 w-25 w-sm-75">
-                <img class="mb-4" src="images/logo.png" alt="nodo logo" class="w-100">
+                <img class="mb-4" src="images/NuevoLogo.png" alt="nodo logo" class="w-100">
             </div>
-            <form class="w-25 w-sm-75" [formGroup]="form" (submit)="login()">
-                <h1 class="h3 mb-3 fw-normal text-center">Iniciar sesión</h1>
+            <form class="w-25 w-sm-80" [formGroup]="form" (submit)="login()">
+                <h1 class="h3 mb-3 fw-normal text-center text-4xl">Iniciar sesión</h1>
 
                 <div class="form-floating mb-2">
                     <input type="text" class="form-control" id="username" placeholder="Usuario"
@@ -23,8 +23,8 @@
                     <span>Contraseña es obligatorio</span>
                     }
                 </div>
-                <a class="cursor-pointer mb-3" data-bs-toggle="modal" data-bs-target="#forgot">Olvide mi contraseña</a>
-                <button class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center" type="submit" [disabled]="loading.login">
+                <a class="cursor-pointer mb-5 text-bluedark" data-bs-toggle="modal" data-bs-target="#forgot">Olvide mi contraseña</a>
+                <button class="btn btn-bluedark w-100 py-2 d-flex align-items-center justify-content-center mt-3" type="submit" [disabled]="loading.login">
                     Ingresar
                     @if (loading.login) {
                         <div class="spinner-border text-light ms-3" role="status">

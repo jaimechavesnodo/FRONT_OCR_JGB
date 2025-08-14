@@ -1,20 +1,84 @@
 <app-header />
-
 <main class="w-100 d-flex">
-  <section class="section-container">
-    <button class="rotate-button" (click)="rotateImage()">Rotar Imagen</button>
-    <pinch-zoom class="content-pinch">
-      <img
-        [src]="currentClientData?.invoiceUrl"
-        width="60%"
-        [style.transform]="'rotate(' + rotationAngle + 'deg)'"
-        style="transition: transform 0.3s ease"
-      />
-    </pinch-zoom>
-  </section>
-  <section
-    class="section-container d-flex justify-content-center align-items-center"
+
+<section class="section-container position-relative">
+  <!-- Controles flotantes centrados abajo -->
+  <div
+    class="image-controls position-absolute bottom-0 start-50 translate-middle-x mb-5 d-flex gap-3"
   >
+    <img
+      src="images/rotar.png"
+      alt="Girar izquierda"
+      (click)="rotateLeft()"
+      class="control-icon"
+    />
+    <img
+      src="images/zoomIn.png"
+      alt="Zoom in"
+      (click)="zoomIn()"
+      class="control-icon"
+    />
+    <img
+      src="images/zoomOut.png"
+      alt="Zoom out"
+      (click)="zoomOut()"
+      class="control-icon"
+    />
+    <img
+      src="images/rotar2.png"
+      alt="Girar derecha"
+      (click)="rotateRight()"
+      class="control-icon"
+    />
+  </div>
+
+  <!-- Contenedor externo con scroll -->
+  <div
+    style="
+      width: 700px;
+      height: 660px;
+      overflow: auto;
+      border: 13px solid #ccc;
+      background-color: #fff;
+      box-sizing: border-box;
+      margin: 0 auto;
+      position: relative;
+    "
+  >
+    <!-- Contenedor interno escalable -->
+<!-- }Reemplazar por [src]="currentClientData?.invoiceUrl" -->
+
+    <div
+      [style.transform]="'scale(' + zoomLevel + ') rotate(' + rotationAngle + 'deg)'"
+      style="
+        transform-origin: top left;
+        transition: transform 0.3s ease;
+        display: inline-block;
+      "
+    >
+      <img
+        [src]= currentClientData?.invoiceUrl 
+        style="
+          display: block;
+          max-width: none;
+          height: auto;
+        "
+        alt="Imagen dinámica"
+      />
+    </div>
+  </div>
+</section>
+
+
+<section class="section-container d-flex justify-content-center align-items-center" >
+  <div class="w-100 d-flex justify-content-center">
+    <div class="w-100">
+        <!-- 📝 Textos superiores -->
+    <div class="text-center mb-2">
+      <h2 class="font-bold fs" style="color: #DADADA; font-size: 3.5rem;">JGB 150 AÑOS</h2>
+      <p class="text-muted">Facturas<br> por aprobar</p>
+    </div>
+
     <div class="w-100 d-flex justify-content-center">
       <form class="w-75" [formGroup]="form">
         <div class="form-floating mb-3">
@@ -30,7 +94,6 @@
             autocomplete="off"
           />
           <label for="nit">Nit</label>
-
           <ul
             *ngIf="filteredNits.length > 0 && showSuggestions"
             class="suggestions-list"
@@ -85,97 +148,52 @@
               [formControl]="asFormControl(prodCtrl)"
               class="flex-grow-1"
             >
-              <!-- Productos para motos -->
-              <ng-option value="Mobil 1 Racing™ 4T 10W-40"
-                >Mobil 1 Racing™ 4T 10W-40</ng-option
-              >
-              <ng-option value="Mobil 1 Racing™ 4T 15W-50"
-                >Mobil 1 Racing™ 4T 15W-50</ng-option
-              >
-              <ng-option value="Mobil 1™ V-twin 20W-50"
-                >Mobil 1™ V-twin 20W-50</ng-option
-              >
-              <ng-option value="Mobil Super™ Moto 4T MX 10W-30"
-                >Mobil Super™ Moto 4T MX 10W-30</ng-option
-              >
-              <ng-option value="Mobil Super™ Moto 4T MX 10W-40"
-                >Mobil Super™ Moto 4T MX 10W-40</ng-option
-              >
-              <ng-option value="Mobil Super™ Moto 4T MX 15W-50"
-                >Mobil Super™ Moto 4T MX 15W-50</ng-option
-              >
-              <ng-option value="Mobil Super™ Moto Scooter MX 10W-40"
-                >Mobil Super™ Moto Scooter MX 10W-40</ng-option
-              >
-              <ng-option value="Mobil Outboard™ Plus 2T"
-                >Mobil Outboard™ Plus 2T</ng-option
-              >
-              <ng-option value="Mobil Outboard™ Plus 10W-40 FC-W"
-                >Mobil Outboard™ Plus 10W-40 FC-W</ng-option
-              >
+          <!-- Productos JGB -->
+          <ng-option value="ALGODON ZIG ZAG">ALGODON ZIG ZAG</ng-option>
+          <ng-option value="PADS FACIALES DE ALGODÓN JGB">PADS FACIALES DE ALGODÓN JGB</ng-option>
+          <ng-option value="ECOPITOS JGB">ECOPITOS JGB</ng-option>
+          <ng-option value="JGB PROPOLEO">JGB PROPOLEO</ng-option>
+          <ng-option value="TARRITO ROJO">TARRITO ROJO</ng-option>
+          <ng-option value="SEDA DENTAL">SEDA DENTAL</ng-option>
+          <ng-option value="BLANQ. YES TRADICIONAL">BLANQ. YES TRADICIONAL</ng-option>
+          <ng-option value="CAJA BLANQ. BOLSA TRAD.">CAJA BLANQ. BOLSA TRAD.</ng-option>
+          <ng-option value="BLANQ.TRAD. GTIS TRAD">BLANQ.TRAD. GTIS TRAD</ng-option>
+          <ng-option value="BLANQ.YES TRAD.MAXICONT.">BLANQ.YES TRAD.MAXICONT.</ng-option>
+          <ng-option value="BLANQ.YES TRAD.SUPERCONT.">BLANQ.YES TRAD.SUPERCONT.</ng-option>
+          <ng-option value="BLANQ. YES TRAD.MEGACONT.">BLANQ. YES TRAD.MEGACONT.</ng-option>
+          <ng-option value="BLANQ. YES TRAD. MEGA">BLANQ. YES TRAD. MEGA</ng-option>
+          <ng-option value="BLANQUEADOR YES FLORAL">BLANQUEADOR YES FLORAL</ng-option>
+          <ng-option value="C.DENTAL TRIPLE ACCION MAX + CEP">C.DENTAL TRIPLE ACCION MAX + CEP</ng-option>
+          <ng-option value="C.DENTAL FLUOC.TRIPLE ACCION MAX">C.DENTAL FLUOC.TRIPLE ACCION MAX</ng-option>
+          <ng-option value="OFTA FLUOC. T.ACCION MAX">OFTA FLUOC. T.ACCION MAX</ng-option>
+          <ng-option value="CREMA DENTAL FLUOC. KIDS CON FLUOR">CREMA DENTAL FLUOC. KIDS CON FLUOR</ng-option>
+          <ng-option value="CEPILLO FLUOC.BLANCURA MAX PACK">CEPILLO FLUOC.BLANCURA MAX PACK</ng-option>
+          <ng-option value="CEPILLO FLUOC. LIMPIEZA MAX PACK">CEPILLO FLUOC. LIMPIEZA MAX PACK</ng-option>
+          <ng-option value="C.DENTAL KIDS CON FLUOR + CEPILLO">C.DENTAL KIDS CON FLUOR + CEPILLO</ng-option>
+          <ng-option value="C.D MULTIACC.BLANC. MAX AHORRAP">C.D MULTIACC.BLANC. MAX AHORRAP</ng-option>
+          <ng-option value="CEPILLO PREVENCION CARIES RISTRA">CEPILLO PREVENCION CARIES RISTRA</ng-option>
+          <ng-option value="C.DENTAL TRIPLE ACCION MAX AHORRAPACK">C.DENTAL TRIPLE ACCION MAX AHORRAPACK</ng-option>
+          <ng-option value="CREMA DENTAL FLUOC. SENSITIVE">CREMA DENTAL FLUOC. SENSITIVE</ng-option>
+          <ng-option value="C.DENTAL FLUOC.KIDS RATONA SIN FLUOR">C.DENTAL FLUOC.KIDS RATONA SIN FLUOR</ng-option>
+          <ng-option value="C.D T.ACCION MAX AHORR.">C.D T.ACCION MAX AHORR.</ng-option>
+          <ng-option value="C.DENTAL FLUOC. KIDS RATON SIN FLUOR">C.DENTAL FLUOC. KIDS RATON SIN FLUOR</ng-option>
+          <ng-option value="PREPACK CAJA TRIPLE ACCION MAX">PREPACK CAJA TRIPLE ACCION MAX</ng-option>
+          <ng-option value="DISPLAY CEPILLO KIDS">DISPLAY CEPILLO KIDS</ng-option>
+          <ng-option value="DISPLAY CEPILLO PREV. CARIES">DISPLAY CEPILLO PREV. CARIES</ng-option>
+          <ng-option value="CEPILLO FLUOC. PREVENCION CARIES">CEPILLO FLUOC. PREVENCION CARIES</ng-option>
+          <ng-option value="KIT ORAL FLUOC. ADULTO TRIPLE ACCION MAX">KIT ORAL FLUOC. ADULTO TRIPLE ACCION MAX</ng-option>
+          <ng-option value="CEPILLO FLUOCARDENT KIDS">CEPILLO FLUOCARDENT KIDS</ng-option>
+          <ng-option value="C.DENTAL PREV.CARIES AHORRAPACK">C.DENTAL PREV.CARIES AHORRAPACK</ng-option>
+          <ng-option value="BIPACK C.D T.ACCION MAX">BIPACK C.D T.ACCION MAX</ng-option>
+          <ng-option value="C.DENTAL T.ACCION MAX AHORR.">C.DENTAL T.ACCION MAX AHORR.</ng-option>
+          <ng-option value="BIPACK FLUOC. SENSITIVE">BIPACK FLUOC. SENSITIVE</ng-option>
+          <ng-option value="OFTA T.A MAX GTIS T.A MAX">OFTA T.A MAX GTIS T.A MAX</ng-option>
+          <ng-option value="CEP. LIMP.MAX GTIS T.A MAX">CEP. LIMP.MAX GTIS T.A MAX</ng-option>
+          <ng-option value="T.A MAX GTS CEP.PREV.CARIES">T.A MAX GTS CEP.PREV.CARIES</ng-option>
+          <ng-option value="CD T.A MAX GTS CEP.LIMP.MAX">CD T.A MAX GTS CEP.LIMP.MAX</ng-option>
 
-              <!-- Productos de motor para autos -->
-              <ng-option value="Mobil 1™ 0W-20">Mobil 1™ 0W-20</ng-option>
-              <ng-option value="Mobil 1™ 0W-40">Mobil 1™ 0W-40</ng-option>
-              <ng-option value="Mobil 1™ ESP 5W-30"
-                >Mobil 1™ ESP 5W-30</ng-option
-              >
-              <ng-option value="Mobil 1™ 5W-30">Mobil 1™ 5W-30</ng-option>
-              <ng-option value="Mobil Super™ 3000 5W-30"
-                >Mobil Super™ 3000 5W-30</ng-option
-              >
-              <ng-option value="Mobil Super™ 3000 5W-40"
-                >Mobil Super™ 3000 5W-40</ng-option
-              >
-              <ng-option value="Mobil Super™ 2000 5W-20"
-                >Mobil Super™ 2000 5W-20</ng-option
-              >
-              <ng-option value="Mobil Super™ 2000 5W-30"
-                >Mobil Super™ 2000 5W-30</ng-option
-              >
-              <ng-option value="Mobil Super™ 2000 10W-30"
-                >Mobil Super™ 2000 10W-30</ng-option
-              >
-              <ng-option value="Mobil Super™ 2000 10W-40"
-                >Mobil Super™ 2000 10W-40</ng-option
-              >
-              <ng-option value="Mobil Super™ 1000 20W-50"
-                >Mobil Super™ 1000 20W-50</ng-option
-              >
 
-              <!-- Productos para vehículos diésel -->
-              <ng-option value="Mobil Delvac™ MX 15W-40"
-                >Mobil Delvac™ MX 15W-40</ng-option
-              >
-              <ng-option value="Mobil Delvac™ Modern 15W-40 Super Defense V3"
-                >Mobil Delvac™ Modern 15W-40 Super Defense V3</ng-option
-              >
-              <ng-option value="Mobil Delvac™ MX ESP 15W-40"
-                >Mobil Delvac™ MX ESP 15W-40</ng-option
-              >
-              <ng-option value="Mobil Delvac™ ModernTM 15W-40 Full Protection"
-                >Mobil Delvac™ ModernTM 15W-40 Full Protection</ng-option
-              >
-              <ng-option value="Mobil Delvac™ XHP ESP 10W-40"
-                >Mobil Delvac™ XHP ESP 10W-40</ng-option
-              >
-              <ng-option value="Mobil Delvac™ Modern 10W-40 Advanced Protection"
-                >Mobil Delvac™ Modern 10W-40 Advanced Protection</ng-option
-              >
-
-              <!-- Refrigerantes y anticongelantes -->
-              <ng-option
-                value="Mobil Delvac™ Extended Life 50/50 Prediluted Coolant/ Antifreeze"
-                >Mobil Delvac™ Extended Life 50/50 Prediluted Coolant/
-                Antifreeze</ng-option
-              >
-              <ng-option
-                value="Mobil Super™ Extended Life Coolant/ Antifreeze 40/60"
-                >Mobil Super™ Extended Life Coolant/ Antifreeze 40/60</ng-option
-              >
-              <ng-option value="Mobil™ Coolant Corrosion Inhibitor"
-                >Mobil™ Coolant Corrosion Inhibitor</ng-option
-              >
+              
             </ng-select>
             <button
               type="button"
@@ -223,41 +241,44 @@
           <span>Numero de factura es obligatorio</span>
           }
         </div>
-        <a
-          class="btn btn-danger w-100 py-2 d-flex align-items-center justify-content-center mb-3"
-          data-bs-toggle="modal"
-          data-bs-target="#reject"
-        >
-          Rechazar
-        </a>
-        <a
-          class="btn btn-success w-100 py-2 d-flex align-items-center justify-content-center mb-3"
-          data-bs-toggle="modal"
-          data-bs-target="#approve"
-        >
-          Aprobar
-        </a>
-        <a
-          class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center mb-3"
-          (click)="updateData('nextOne')"
-        >
-          Saltar Factura
-        </a>
-      </form>
+        <div class="d-flex gap-3">
+          <a class="btn btn-danger py-3 d-flex align-items-center justify-content-center flex-grow-1 fw-bold"
+            data-bs-toggle="modal"
+            data-bs-target="#reject"
+          >
+            Rechazar
+          </a>
+            <a
+            class="btn btn-yellow py-2 d-flex align-items-center justify-content-center flex-grow-1 fw-bold"
+            (click)="updateData('nextOne')"
+          >
+            Saltar
+          </a>
+          <a
+            class="btn btn-success py-2 d-flex align-items-center justify-content-center flex-grow-1 fw-bold"
+            data-bs-toggle="modal"
+            data-bs-target="#approve"
+          >
+            Aprobar
+          </a>
+        </div>
+              </form>
+            </div>
     </div>
-  </section>
-</main>
+  </div>
+</section>
+        </main>
 
-<div
-  class="modal fade"
-  id="reject"
-  data-bs-backdrop="static"
-  data-bs-keyboard="false"
-  data-bs-theme="dark"
-  tabindex="-1"
-  aria-labelledby="rejectLabel"
-  aria-hidden="true"
->
+        <div
+          class="modal fade"
+          id="reject"
+          data-bs-backdrop="static"
+          data-bs-keyboard="false"
+          data-bs-theme="dark"
+          tabindex="-1"
+          aria-labelledby="rejectLabel"
+          aria-hidden="true"
+        >
   <div class="modal-dialog modal-dialog-centered text-white">
     <div class="modal-content">
       <div class="modal-header">

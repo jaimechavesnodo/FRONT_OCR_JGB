@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    apiUrl: 'https://backocrmobil2025-b5gqbjbzhjgsgec8.eastus-01.azurewebsites.net',
+    apiUrl: 'https://ca69fd2ef091.ngrok-free.app',
 };

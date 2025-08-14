@@ -58,6 +58,63 @@ get() {
     this.getAgentShopping(); // 👈 Ahora se llama aquí, cuando ya hay data
   });
 }
+  // Variables con las dimensiones originales de la imagen
+  imageWidth = 500;  // ancho original en px, cambia según tu imagen
+  imageHeight = 500; // alto original en px, cambia según tu imagen
+  zoomLevel = 1;     // zoom inicial
+
+// En el contenedor, en lugar de min-width y min-height, usa [style.min-width.px] y [style.min-height.px]:
+  rotationAngle = 0;
+
+  translateX = 0;
+  translateY = 0;
+
+  isDragging = false;
+  startX = 0;
+  startY = 0;
+  
+
+  startDrag(event: MouseEvent) {
+    this.isDragging = true;
+    this.startX = event.clientX - this.translateX;
+    this.startY = event.clientY - this.translateY;
+  }
+
+  onDrag(event: MouseEvent) {
+    if (!this.isDragging) return;
+    this.translateX = event.clientX - this.startX;
+    this.translateY = event.clientY - this.startY;
+  }
+
+  endDrag() {
+    this.isDragging = false;
+  }
+
+naturalWidth = 0;
+naturalHeight = 0;
+
+onImageLoad(event: Event) {
+  const img = event.target as HTMLImageElement;
+  this.naturalWidth = img.naturalWidth;
+  this.naturalHeight = img.naturalHeight;
+  this.zoomLevel = 1; // Reset zoom on new image load
+}
+
+zoomIn() {
+  this.zoomLevel = Math.min(this.zoomLevel + 0.2, 3);
+}
+
+zoomOut() {
+  this.zoomLevel = Math.max(this.zoomLevel - 0.2, 0.2);
+}
+
+rotateLeft() {
+  this.rotationAngle -= 90;
+}
+
+rotateRight() {
+  this.rotationAngle += 90;
+}
 
   // Limpiar el formulario y los datos actuales
   clean() {
@@ -237,7 +294,7 @@ getAgentShopping() {
   get value() { return this.form.get('value'); }
   get invoiceNumber() { return this.form.get('invoiceNumber'); }
 
-  rotationAngle = 0;
+  // rotationAngle = 0;
   rotateImage() {
   this.rotationAngle = (this.rotationAngle + 90) % 360; // rota 90° en cada clic
 }
@@ -285,6 +342,7 @@ removeProduct(index: number) {
 getSelectedProducts(): string {
   return this.products.controls.map(p => p.value).join(', ');
 }
+
 
 
 }
