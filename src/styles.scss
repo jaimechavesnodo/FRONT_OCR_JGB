@@ -56,8 +56,8 @@
 // Otros estilos globales
 .section-container {
   width: 50%;
-  height: calc(100vh - 58px);
   padding: 25px;
+  min-height: calc(100vh - 58px); /* Da una altura base sin limitar el crecimiento */
 }
 
 .cursor-pointer {

@@ -100,3 +100,9 @@
 .control-icon:hover {
   transform: scale(1.2);
 }
+
+.select-product {
+  min-width: 300px;
+  flex-grow: 1;
+}
+
