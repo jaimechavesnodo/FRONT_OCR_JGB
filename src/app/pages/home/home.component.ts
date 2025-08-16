@@ -50,6 +50,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.loadForm();
     this.get();
+    this.loadPendingInvoicesCount();
   }
 
 get() {
@@ -127,16 +128,57 @@ loadForm(): void {
     nit: new FormControl('', Validators.required),
     name: new FormControl('', Validators.required),
     date: new FormControl('', Validators.required),
-    products: new FormArray([new FormControl('', Validators.required)]),
-    value: new FormControl('', Validators.required),
+    products: new FormArray([
+      new FormGroup({
+        product: new FormControl('', Validators.required),
+        price: new FormControl(0, Validators.required),
+        quantity: new FormControl(1, Validators.required),
+      })
+    ]),
+    value: new FormControl(0, Validators.required),
     invoiceNumber: new FormControl('', Validators.required),
+  });
+
+  // Suscribirse a cambios en cada producto para recalcular
+  this.subscribeToProductChanges();
+
+  this.calculateTotal();
+}
+
+subscribeToProductChanges() {
+  this.products.controls.forEach((group: AbstractControl) => {
+    group.get('price')?.valueChanges.subscribe(() => this.calculateTotal());
+    group.get('quantity')?.valueChanges.subscribe(() => this.calculateTotal());
+  });
+}
+
+total: number = 0;
+
+calculateTotal() {
+  this.total = this.products.controls.reduce((acc, group: AbstractControl) => {
+    const price = group.get('price')?.value || 0;
+    const quantity = group.get('quantity')?.value || 1;
+    return acc + (price * quantity);
+  }, 0);
+
+  this.form.get('value')?.setValue(this.total, { emitEvent: false });
+}
+
+loadPendingInvoicesCount() {
+  this.userService.getPendingInvoicesCount().subscribe({
+    next: (res) => {
+      this.pendingInvoicesCount = res?.count ?? 0;
+    },
+    error: () => {
+      this.pendingInvoicesCount = 0;
+    }
   });
 }
 
 getAgentShopping() {
   this.userService.getAgentShopping(this.user?.id).subscribe((response: any) => {
     const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
-    //console.log('📦 Respuesta de getAgentShopping:', parsedResponse);
+    console.log('📦 Respuesta de getAgentShopping:', parsedResponse);
     this.currentClientData = parsedResponse;
 
     const nitLimpio = this.clearNit(parsedResponse?.nit);
@@ -154,18 +196,30 @@ getAgentShopping() {
     const nombreComercio = comercio?.nameStore || parsedResponse?.commerce;
     //console.log('🧩 Comercio final asignado:', nombreComercio);
 
-    const productsArray = new FormArray([
-      new FormControl('', Validators.required)
-    ]);
+    const productsArray = new FormArray(
+  (parsedResponse.products || []).map((p: any) => new FormGroup({
+    product: new FormControl(p.product || '', Validators.required),
+    price: new FormControl(p.price || 0, Validators.required),
+    quantity: new FormControl(p.quantity || 1, Validators.required),
+  }))
+);
+if (productsArray.length === 0) {
+  productsArray.push(new FormGroup({
+    product: new FormControl('', Validators.required),
+    price: new FormControl(0, Validators.required),
+    quantity: new FormControl(1, Validators.required),
+  }));
+}
 
-    this.form = new FormGroup({
-      nit: new FormControl(parsedResponse?.nit, Validators.required),
-      name: new FormControl(nombreComercio, Validators.required), // 👈 Aquí aseguramos coincidencia con ng-option
-      date: new FormControl(this.parseDate(parsedResponse?.dateInvoice), Validators.required),
-      products: productsArray,
-      value: new FormControl(parsedResponse?.price, Validators.required),
-      invoiceNumber: new FormControl(parsedResponse?.invoiceNumber, Validators.required),
-    });
+
+this.form = new FormGroup({
+  nit: new FormControl(parsedResponse?.nit, Validators.required),
+  name: new FormControl(nombreComercio, Validators.required),
+  date: new FormControl(this.parseDate(parsedResponse?.dateInvoice), Validators.required),
+  products: productsArray,
+  value: new FormControl(parsedResponse?.price, Validators.required),
+  invoiceNumber: new FormControl(parsedResponse?.invoiceNumber, Validators.required),
+});
 
     this.onNitInput(parsedResponse?.nit);
   });
@@ -192,43 +246,72 @@ getAgentShopping() {
     return dateString;
   }
 
-  updateData(type: 'approve' | 'reject' | 'nextOne') {
-    const payload = this.prepareData(type);
-    //console.log('🔍 Payload enviado a backend:', payload);
-    //console.log('ID del cliente real:', this.currentClientData.idClient);
+updateData(type: 'approve' | 'reject' | 'nextOne') {
+  if (!this.currentClientData || !this.currentClientData.id) {
+    this.alertsService.error('Error', 'No hay una factura cargada para procesar.');
+    return;
+  }
 
-    this.userService.updateAgentShopping(this.prepareData(type), this.currentClientData.id).subscribe({
-      next: (response: any) => {
-        //console.log(response);
-        const closeBtnModal = document.getElementById(type + 'Close');
-        closeBtnModal?.click();
-        if (type === 'approve') {
-          this.userService.updatePoints({ idClient: this.currentClientData.idClient, purchaseValue: this.value?.value }).subscribe((response: any) => {
-            //console.log(response);
-          })
-        }
+  const payload = this.prepareData(type);
+  const shoppingClientId = this.currentClientData.id;
 
-        if (type === 'reject') {
-          this.userService.rejectInvoice({ idClient: this.currentClientData.idClient, rejectionMessage: this.rejectOptions }).subscribe((response: any) => {
-            //console.log(response);
-          })
-        }
-        this.getInvoices();
-        this.alertsService.success('Éxito', this.generateMessage(type));
-        this.getAgentShopping();
-        this.clean();
-      },
-      error: (err) => {
-        this.alertsService.error('Error', 'No se ha podido actualizar la factura, intentelo de nuevo.');
+  this.userService.updateAgentShopping(payload, shoppingClientId).subscribe({
+    next: () => {
+      const closeBtnModal = document.getElementById(type + 'Close');
+      closeBtnModal?.click();
+
+      if (type === 'approve') {
+  const shoppingClientId = this.currentClientData.id;
+  
+  this.userService.awardPrizeByInvoice(shoppingClientId).subscribe({
+    next: (awardResponse: any) => {
+      this.alertsService.success('Aprobado Exitosamente', 'Se ha aprobado la factura correctamente');
+      this.finalizeInvoiceProcess(type);
+    },
+    error: (awardError) => {
+      // Si no se asigna premio por grupo incompleto, igual dar éxito en aprobación
+      //console.warn('Premio no asignado:', awardError.error?.message || awardError.message);
+      this.alertsService.success('Factura aprobada', this.generateMessage(type));
+      this.finalizeInvoiceProcess(type);
+    }
+  });
+}
+
+      if (type === 'reject') {
+        this.userService.rejectInvoice({
+          idClient: this.currentClientData.idClient,
+          rejectionMessage: this.rejectOptions
+        }).subscribe(() => {
+          this.alertsService.success('Éxito', this.generateMessage(type));
+          this.finalizeInvoiceProcess(type);
+        });
       }
-    });
-  }
 
-  getInvoices(): void {
-    this.userService.getInvoices().subscribe((response: any) => {
-      this.invoiceService.updateInvoiceValue(response?.count);
-    });
-  }
+      if (type === 'nextOne') {
+        this.alertsService.success('Éxito', this.generateMessage(type));
+        this.finalizeInvoiceProcess(type);
+      }
+    },
+    error: () => {
+      this.alertsService.error('Error', 'No se ha podido actualizar la factura, inténtelo de nuevo.');
+    }
+  });
+}
+
+finalizeInvoiceProcess(type: 'approve' | 'reject' | 'nextOne') {
+  this.getInvoices();
+  this.getAgentShopping();
+  this.clean();
+  this.loadPendingInvoicesCount();
+}
+
+
+
+getInvoices(): void {
+  this.userService.getInvoices().subscribe((response: any) => {
+    this.invoiceService.updateInvoiceValue(response?.count);
+  });
+}
 
   generateMessage(type: 'approve' | 'reject' | 'nextOne'): string {
     const messages = {
@@ -239,21 +322,27 @@ getAgentShopping() {
     return messages[type];
   }
 
+  pendingInvoicesCount: number | null = null;
+
   prepareData(type: 'approve' | 'reject' | 'nextOne'): any {
     
     const datas = {
       'approve': {
-  "idClient": this.currentClientData?.idClient,
-  "price": this.value?.value,
-  "nit": this.nit?.value,
-  "invoiceUrl": this.currentClientData?.invoiceUrl,
-  "typeProduct": this.products.value.join(', '),
-  "invoiceNumber": this.invoiceNumber?.value,
-  "dateInvoice": this.currentClientData?.dateInvoice,
-  "invoiceRead": 1,
-  "idAgent": this.user?.id,
-  "statusInvoice": 1,
-  "commerce": this.name?.value
+    "idClient": this.currentClientData?.idClient,
+    "price": this.value?.value,
+    "nit": this.nit?.value,
+    "invoiceUrl": this.currentClientData?.invoiceUrl,
+    "invoiceNumber": this.invoiceNumber?.value,
+    "dateInvoice": this.currentClientData?.dateInvoice,
+    "invoiceRead": 1,
+    "idAgent": this.user?.id,
+    "statusInvoice": 1,
+    "commerce": this.name?.value,
+    "products": this.products.value.map((p: any) => ({
+      "name": p.product,
+      "price": p.price,
+      "quantity": p.quantity
+    }))
       },
       'reject': {
         'idAgent': this.user?.id,
@@ -269,15 +358,27 @@ getAgentShopping() {
     return datas[type];
   }
 
-  get products() {
+  get products(): FormArray {
     return this.form.get('products') as FormArray;
   }
 
-  asFormControl(ctrl: AbstractControl): FormControl {
-    return ctrl as FormControl;
-  }
 
+asFormControl(ctrl: AbstractControl | null): FormControl {
+  if (!ctrl) throw new Error('Expected FormControl, got null');
+  return ctrl as FormControl;
+}
 
+getProductControl(index: number): FormControl {
+  return this.products.at(index).get('product') as FormControl;
+}
+
+getQuantityControl(index: number): FormControl {
+  return this.products.at(index).get('quantity') as FormControl;
+}
+
+getPriceControl(index: number): FormControl {
+  return this.products.at(index).get('price') as FormControl;
+}
   getLastWeek() {
     const date = new Date();
     date.setDate(date.getDate() - 7);
@@ -330,19 +431,32 @@ handleNitInput(event: Event) {
 }
 
 addProduct() {
-  this.products.push(new FormControl('', Validators.required));
+  const newProduct = new FormGroup({
+    product: new FormControl('', Validators.required),
+    price: new FormControl(0, Validators.required),
+    quantity: new FormControl(1, Validators.required)
+  });
+
+  this.products.push(newProduct);
+
+  // Suscribir a cambios de nuevo producto
+  newProduct.get('price')?.valueChanges.subscribe(() => this.calculateTotal());
+  newProduct.get('quantity')?.valueChanges.subscribe(() => this.calculateTotal());
 }
 
 removeProduct(index: number) {
-  if (this.products.length > 1) {
-    this.products.removeAt(index);
-  }
+  this.products.removeAt(index);
+  this.calculateTotal();
 }
 
 getSelectedProducts(): string {
-  return this.products.controls.map(p => p.value).join(', ');
+  return this.products.controls.map(p => p.get('product')?.value).join(', ');
 }
 
-
+productList: { name: string }[] = [
+  { name: 'Producto A' },
+  { name: 'Producto B' },
+  { name: 'Producto C' }
+];
 
 }

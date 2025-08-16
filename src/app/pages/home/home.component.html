@@ -1,284 +1,372 @@
 <app-header />
 <main class="w-100 d-flex">
-
-<section class="section-container position-relative">
-  <!-- Controles flotantes centrados abajo -->
-  <div
-    class="image-controls position-absolute bottom-0 start-50 translate-middle-x mb-5 d-flex gap-3"
-  >
-    <img
-      src="images/rotar.png"
-      alt="Girar izquierda"
-      (click)="rotateLeft()"
-      class="control-icon"
-    />
-    <img
-      src="images/zoomIn.png"
-      alt="Zoom in"
-      (click)="zoomIn()"
-      class="control-icon"
-    />
-    <img
-      src="images/zoomOut.png"
-      alt="Zoom out"
-      (click)="zoomOut()"
-      class="control-icon"
-    />
-    <img
-      src="images/rotar2.png"
-      alt="Girar derecha"
-      (click)="rotateRight()"
-      class="control-icon"
-    />
-  </div>
-
-  <!-- Contenedor externo con scroll -->
-  <div
-    style="
-      width: 700px;
-      height: 660px;
-      overflow: auto;
-      border: 13px solid #ccc;
-      background-color: #fff;
-      box-sizing: border-box;
-      margin: 0 auto;
-      position: relative;
-    "
-  >
-    <!-- Contenedor interno escalable -->
-<!-- }Reemplazar por [src]="currentClientData?.invoiceUrl" -->
-
+  <section class="section-container position-relative">
+    <!-- Contenedor externo con scroll -->
     <div
-      [style.transform]="'scale(' + zoomLevel + ') rotate(' + rotationAngle + 'deg)'"
       style="
-        transform-origin: top left;
-        transition: transform 0.3s ease;
-        display: inline-block;
+        width: 700px;
+        height: 620px;
+        overflow: auto;
+        border: 13px solid #ccc;
+        background-color: #fff;
+        box-sizing: border-box;
+        margin: 0 auto;
+        position: relative;
       "
     >
-      <img
-        [src]= currentClientData?.invoiceUrl 
-        style="
-          display: block;
-          max-width: none;
-          height: auto;
+      <div
+        [style.transform]="
+          'scale(' + zoomLevel + ') rotate(' + rotationAngle + 'deg)'
         "
-        alt="Imagen dinámica"
+        style="
+          transform-origin: top left;
+          transition: transform 0.3s ease;
+          display: inline-block;
+        "
+      >
+        <img
+          [src]="currentClientData?.invoiceUrl"
+          style="display: block; max-width: none; height: auto"
+          alt="Imagen dinámica"
+        />
+      </div>
+    </div>
+
+    <div
+      class="image-controls position-absolute bottom-0 start-50 translate-middle-x mb-3 d-flex gap-3"
+      style="z-index: 10"
+    >
+      <img
+        src="images/rotar.png"
+        alt="Girar izquierda"
+        (click)="rotateLeft()"
+        class="control-icon"
+      />
+      <img
+        src="images/zoomIn.png"
+        alt="Zoom in"
+        (click)="zoomIn()"
+        class="control-icon"
+      />
+      <img
+        src="images/zoomOut.png"
+        alt="Zoom out"
+        (click)="zoomOut()"
+        class="control-icon"
+      />
+      <img
+        src="images/rotar2.png"
+        alt="Girar derecha"
+        (click)="rotateRight()"
+        class="control-icon"
       />
     </div>
-  </div>
-</section>
-
-
-<section class="section-container d-flex justify-content-center align-items-center" >
-  <div class="w-100 d-flex justify-content-center">
-    <div class="w-100">
-        <!-- 📝 Textos superiores -->
-    <div class="text-center mb-2">
-      <h2 class="font-bold fs" style="color: #DADADA; font-size: 3.5rem;">JGB 150 AÑOS</h2>
-      <p class="text-muted">Facturas<br> por aprobar</p>
-    </div>
-
+  </section>
+  <section
+    class="section-container d-flex justify-content-center align-items-center"
+  >
     <div class="w-100 d-flex justify-content-center">
-      <form class="w-75" [formGroup]="form">
-        <div class="form-floating mb-3">
-          <input
-            type="text"
-            class="form-control"
-            id="nit"
-            placeholder="Nit"
-            formControlName="nit"
-            (input)="handleNitInput($event)"
-            (blur)="hideSuggestionsWithDelay()"
-            (focus)="onNitInput(nit?.value || '')"
-            autocomplete="off"
-          />
-          <label for="nit">Nit</label>
-          <ul
-            *ngIf="filteredNits.length > 0 && showSuggestions"
-            class="suggestions-list"
+      <div class="w-100">
+        <!-- 📝 Textos superiores -->
+        <div class="text-center mb-2">
+          <h2 class="font-bold fs" style="color: #dadada; font-size: 3.5rem">
+            JGB 150 AÑOS
+          </h2>
+          <p class="text-muted">
+            Facturas<br />
+            por aprobar
+          </p>
+          <p
+            class="fs-3 fw-bold text-dark"
+            *ngIf="pendingInvoicesCount !== null"
           >
-            <li
-              *ngFor="let item of filteredNits"
-              (mousedown)="selectNit(item.nit)"
-            >
-              {{ item.nit }} - {{ item.nameStore }}
-            </li>
-          </ul>
-
-          @if(nit?.invalid && (nit?.dirty || nit?.touched)) {
-          <span>Nit es obligatorio</span>
-          }
+            {{ pendingInvoicesCount }}
+          </p>
         </div>
-        <div class="form-floating mb-3">
-          <div class="form-floating">
-            <ng-select formControlName="name">
-              @for (item of establishments; track item.id) {
-              <ng-option value="{{ item.nameStore }}">{{
-                item.nameStore
-              }}</ng-option>
-              }
-            </ng-select>
-            <label for="product">Establecimiento</label>
-          </div>
-          @if(name?.invalid && (name?.dirty || name?.touched)) {
-          <span>Establecimiento es obligatorio</span>
-          }
-        </div>
-        <div class="form-floating mb-3">
-          <input
-            type="date"
-            class="form-control"
-            id="date"
-            placeholder="Fecha"
-            formControlName="date"
-          />
-          <label for="date">Fecha</label>
-          @if(date?.invalid && (date?.dirty || date?.touched)) {
-          <span>Fecha es obligatorio</span>
-          }
-        </div>
-
-        <div
-          class="form-floating mb-3"
-          *ngFor="let prodCtrl of products.controls; let i = index"
-        >
-          <div class="d-flex align-items-center">
-            <ng-select
-              [formControl]="asFormControl(prodCtrl)"
-              class="flex-grow-1"
-            >
-          <!-- Productos JGB -->
-          <ng-option value="ALGODON ZIG ZAG">ALGODON ZIG ZAG</ng-option>
-          <ng-option value="PADS FACIALES DE ALGODÓN JGB">PADS FACIALES DE ALGODÓN JGB</ng-option>
-          <ng-option value="ECOPITOS JGB">ECOPITOS JGB</ng-option>
-          <ng-option value="JGB PROPOLEO">JGB PROPOLEO</ng-option>
-          <ng-option value="TARRITO ROJO">TARRITO ROJO</ng-option>
-          <ng-option value="SEDA DENTAL">SEDA DENTAL</ng-option>
-          <ng-option value="BLANQ. YES TRADICIONAL">BLANQ. YES TRADICIONAL</ng-option>
-          <ng-option value="CAJA BLANQ. BOLSA TRAD.">CAJA BLANQ. BOLSA TRAD.</ng-option>
-          <ng-option value="BLANQ.TRAD. GTIS TRAD">BLANQ.TRAD. GTIS TRAD</ng-option>
-          <ng-option value="BLANQ.YES TRAD.MAXICONT.">BLANQ.YES TRAD.MAXICONT.</ng-option>
-          <ng-option value="BLANQ.YES TRAD.SUPERCONT.">BLANQ.YES TRAD.SUPERCONT.</ng-option>
-          <ng-option value="BLANQ. YES TRAD.MEGACONT.">BLANQ. YES TRAD.MEGACONT.</ng-option>
-          <ng-option value="BLANQ. YES TRAD. MEGA">BLANQ. YES TRAD. MEGA</ng-option>
-          <ng-option value="BLANQUEADOR YES FLORAL">BLANQUEADOR YES FLORAL</ng-option>
-          <ng-option value="C.DENTAL TRIPLE ACCION MAX + CEP">C.DENTAL TRIPLE ACCION MAX + CEP</ng-option>
-          <ng-option value="C.DENTAL FLUOC.TRIPLE ACCION MAX">C.DENTAL FLUOC.TRIPLE ACCION MAX</ng-option>
-          <ng-option value="OFTA FLUOC. T.ACCION MAX">OFTA FLUOC. T.ACCION MAX</ng-option>
-          <ng-option value="CREMA DENTAL FLUOC. KIDS CON FLUOR">CREMA DENTAL FLUOC. KIDS CON FLUOR</ng-option>
-          <ng-option value="CEPILLO FLUOC.BLANCURA MAX PACK">CEPILLO FLUOC.BLANCURA MAX PACK</ng-option>
-          <ng-option value="CEPILLO FLUOC. LIMPIEZA MAX PACK">CEPILLO FLUOC. LIMPIEZA MAX PACK</ng-option>
-          <ng-option value="C.DENTAL KIDS CON FLUOR + CEPILLO">C.DENTAL KIDS CON FLUOR + CEPILLO</ng-option>
-          <ng-option value="C.D MULTIACC.BLANC. MAX AHORRAP">C.D MULTIACC.BLANC. MAX AHORRAP</ng-option>
-          <ng-option value="CEPILLO PREVENCION CARIES RISTRA">CEPILLO PREVENCION CARIES RISTRA</ng-option>
-          <ng-option value="C.DENTAL TRIPLE ACCION MAX AHORRAPACK">C.DENTAL TRIPLE ACCION MAX AHORRAPACK</ng-option>
-          <ng-option value="CREMA DENTAL FLUOC. SENSITIVE">CREMA DENTAL FLUOC. SENSITIVE</ng-option>
-          <ng-option value="C.DENTAL FLUOC.KIDS RATONA SIN FLUOR">C.DENTAL FLUOC.KIDS RATONA SIN FLUOR</ng-option>
-          <ng-option value="C.D T.ACCION MAX AHORR.">C.D T.ACCION MAX AHORR.</ng-option>
-          <ng-option value="C.DENTAL FLUOC. KIDS RATON SIN FLUOR">C.DENTAL FLUOC. KIDS RATON SIN FLUOR</ng-option>
-          <ng-option value="PREPACK CAJA TRIPLE ACCION MAX">PREPACK CAJA TRIPLE ACCION MAX</ng-option>
-          <ng-option value="DISPLAY CEPILLO KIDS">DISPLAY CEPILLO KIDS</ng-option>
-          <ng-option value="DISPLAY CEPILLO PREV. CARIES">DISPLAY CEPILLO PREV. CARIES</ng-option>
-          <ng-option value="CEPILLO FLUOC. PREVENCION CARIES">CEPILLO FLUOC. PREVENCION CARIES</ng-option>
-          <ng-option value="KIT ORAL FLUOC. ADULTO TRIPLE ACCION MAX">KIT ORAL FLUOC. ADULTO TRIPLE ACCION MAX</ng-option>
-          <ng-option value="CEPILLO FLUOCARDENT KIDS">CEPILLO FLUOCARDENT KIDS</ng-option>
-          <ng-option value="C.DENTAL PREV.CARIES AHORRAPACK">C.DENTAL PREV.CARIES AHORRAPACK</ng-option>
-          <ng-option value="BIPACK C.D T.ACCION MAX">BIPACK C.D T.ACCION MAX</ng-option>
-          <ng-option value="C.DENTAL T.ACCION MAX AHORR.">C.DENTAL T.ACCION MAX AHORR.</ng-option>
-          <ng-option value="BIPACK FLUOC. SENSITIVE">BIPACK FLUOC. SENSITIVE</ng-option>
-          <ng-option value="OFTA T.A MAX GTIS T.A MAX">OFTA T.A MAX GTIS T.A MAX</ng-option>
-          <ng-option value="CEP. LIMP.MAX GTIS T.A MAX">CEP. LIMP.MAX GTIS T.A MAX</ng-option>
-          <ng-option value="T.A MAX GTS CEP.PREV.CARIES">T.A MAX GTS CEP.PREV.CARIES</ng-option>
-          <ng-option value="CD T.A MAX GTS CEP.LIMP.MAX">CD T.A MAX GTS CEP.LIMP.MAX</ng-option>
-
-
-              
-            </ng-select>
-            <button
-              type="button"
-              class="btn btn-secondary ms-2"
-              *ngIf="i === products.length - 1"
-              (click)="addProduct()"
-            >
-              Agregar
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger ms-2"
-              *ngIf="products.length > 1"
-              (click)="removeProduct(i)"
-            >
-              ✖
-            </button>
-          </div>
-        </div>
-
-        <div class="form-floating mb-3">
-          <input
-            type="text"
-            class="form-control"
-            id="value"
-            placeholder="Valor"
-            formControlName="value"
-          />
-          <label for="value">Valor</label>
-          @if(value?.invalid && (value?.dirty || value?.touched)) {
-          <span>Valor es obligatorio</span>
-          }
-        </div>
-        <div class="form-floating mb-3">
-          <input
-            type="text"
-            class="form-control"
-            id="invoiceNumber"
-            placeholder="Valor"
-            formControlName="invoiceNumber"
-          />
-          <label for="invoiceNumber">Numero de factura</label>
-          @if(invoiceNumber?.invalid && (invoiceNumber?.dirty ||
-          invoiceNumber?.touched)) {
-          <span>Numero de factura es obligatorio</span>
-          }
-        </div>
-        <div class="d-flex gap-3">
-          <a class="btn btn-danger py-3 d-flex align-items-center justify-content-center flex-grow-1 fw-bold"
-            data-bs-toggle="modal"
-            data-bs-target="#reject"
-          >
-            Rechazar
-          </a>
-            <a
-            class="btn btn-yellow py-2 d-flex align-items-center justify-content-center flex-grow-1 fw-bold"
-            (click)="updateData('nextOne')"
-          >
-            Saltar
-          </a>
-          <a
-            class="btn btn-success py-2 d-flex align-items-center justify-content-center flex-grow-1 fw-bold"
-            data-bs-toggle="modal"
-            data-bs-target="#approve"
-          >
-            Aprobar
-          </a>
-        </div>
-              </form>
+        <div class="w-100 d-flex justify-content-center">
+          <form class="w-75" [formGroup]="form">
+            <div class="form-floating mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="nit"
+                placeholder="Nit"
+                formControlName="nit"
+                (input)="handleNitInput($event)"
+                (blur)="hideSuggestionsWithDelay()"
+                (focus)="onNitInput(nit?.value || '')"
+                autocomplete="off"
+              />
+              <label for="nit">Nit</label>
+              <ul
+                *ngIf="filteredNits.length > 0 && showSuggestions"
+                class="suggestions-list"
+              >
+                <li
+                  *ngFor="let item of filteredNits"
+                  (mousedown)="selectNit(item.nit)"
+                >
+                  {{ item.nit }} - {{ item.nameStore }}
+                </li>
+              </ul>
+              @if(nit?.invalid && (nit?.dirty || nit?.touched)) {
+              <span>Nit es obligatorio</span> }
             </div>
-    </div>
-  </div>
-</section>
-        </main>
+            <div class="form-floating mb-3">
+              <div class="form-floating">
+                <ng-select formControlName="name">
+                  @for (item of establishments; track item.id) {
+                  <ng-option value="{{ item.nameStore }}">{{
+                    item.nameStore
+                  }}</ng-option>
+                  }
+                </ng-select>
+                <label for="product">Establecimiento</label>
+              </div>
+              @if(name?.invalid && (name?.dirty || name?.touched)) {
+              <span>Establecimiento es obligatorio</span> }
+            </div>
+            <div class="form-floating mb-3">
+              <input
+                type="date"
+                class="form-control"
+                id="date"
+                placeholder="Fecha"
+                formControlName="date"
+              />
+              <label for="date">Fecha</label> @if(date?.invalid && (date?.dirty
+              || date?.touched)) { <span>Fecha es obligatorio</span> }
+            </div>
 
-        <div
-          class="modal fade"
-          id="reject"
-          data-bs-backdrop="static"
-          data-bs-keyboard="false"
-          data-bs-theme="dark"
-          tabindex="-1"
-          aria-labelledby="rejectLabel"
-          aria-hidden="true"
-        >
+            <div
+              class="d-flex align-items-center gap-2 mb-2"
+              *ngFor="let item of products.controls; let i = index"
+            >
+              <div class="d-flex align-items-center gap-1">
+                <ng-select
+                  [formControl]="getProductControl(i)"
+                  class="select-product"
+                >
+                  <ng-option value="ALGODON ZIG ZAG">ALGODON ZIG ZAG</ng-option>
+                  <ng-option value="PADS FACIALES DE ALGODÓN JGB"
+                    >PADS FACIALES DE ALGODÓN JGB</ng-option
+                  >
+                  <ng-option value="ECOPITOS JGB">ECOPITOS JGB</ng-option>
+                  <ng-option value="JGB PROPOLEO">JGB PROPOLEO</ng-option>
+                  <ng-option value="TARRITO ROJO">TARRITO ROJO</ng-option>
+                  <ng-option value="SEDA DENTAL">SEDA DENTAL</ng-option>
+                  <ng-option value="BLANQ. YES TRADICIONAL"
+                    >BLANQ. YES TRADICIONAL</ng-option
+                  >
+                  <ng-option value="CAJA BLANQ. BOLSA TRAD."
+                    >CAJA BLANQ. BOLSA TRAD.</ng-option
+                  >
+                  <ng-option value="BLANQ.TRAD. GTIS TRAD"
+                    >BLANQ.TRAD. GTIS TRAD</ng-option
+                  >
+                  <ng-option value="BLANQ.YES TRAD.MAXICONT."
+                    >BLANQ.YES TRAD.MAXICONT.</ng-option
+                  >
+                  <ng-option value="BLANQ.YES TRAD.SUPERCONT."
+                    >BLANQ.YES TRAD.SUPERCONT.</ng-option
+                  >
+                  <ng-option value="BLANQ. YES TRAD.MEGACONT."
+                    >BLANQ. YES TRAD.MEGACONT.</ng-option
+                  >
+                  <ng-option value="BLANQ. YES TRAD. MEGA"
+                    >BLANQ. YES TRAD. MEGA</ng-option
+                  >
+                  <ng-option value="BLANQUEADOR YES FLORAL"
+                    >BLANQUEADOR YES FLORAL</ng-option
+                  >
+                  <ng-option value="C.DENTAL TRIPLE ACCION MAX + CEP"
+                    >C.DENTAL TRIPLE ACCION MAX + CEP</ng-option
+                  >
+                  <ng-option value="C.DENTAL FLUOC.TRIPLE ACCION MAX"
+                    >C.DENTAL FLUOC.TRIPLE ACCION MAX</ng-option
+                  >
+                  <ng-option value="OFTA FLUOC. T.ACCION MAX"
+                    >OFTA FLUOC. T.ACCION MAX</ng-option
+                  >
+                  <ng-option value="CREMA DENTAL FLUOC. KIDS CON FLUOR"
+                    >CREMA DENTAL FLUOC. KIDS CON FLUOR</ng-option
+                  >
+                  <ng-option value="CEPILLO FLUOC.BLANCURA MAX PACK"
+                    >CEPILLO FLUOC.BLANCURA MAX PACK</ng-option
+                  >
+                  <ng-option value="CEPILLO FLUOC. LIMPIEZA MAX PACK"
+                    >CEPILLO FLUOC. LIMPIEZA MAX PACK</ng-option
+                  >
+                  <ng-option value="C.DENTAL KIDS CON FLUOR + CEPILLO"
+                    >C.DENTAL KIDS CON FLUOR + CEPILLO</ng-option
+                  >
+                  <ng-option value="C.D MULTIACC.BLANC. MAX AHORRAP"
+                    >C.D MULTIACC.BLANC. MAX AHORRAP</ng-option
+                  >
+                  <ng-option value="CEPILLO PREVENCION CARIES RISTRA"
+                    >CEPILLO PREVENCION CARIES RISTRA</ng-option
+                  >
+                  <ng-option value="C.DENTAL TRIPLE ACCION MAX AHORRAPACK"
+                    >C.DENTAL TRIPLE ACCION MAX AHORRAPACK</ng-option
+                  >
+                  <ng-option value="CREMA DENTAL FLUOC. SENSITIVE"
+                    >CREMA DENTAL FLUOC. SENSITIVE</ng-option
+                  >
+                  <ng-option value="C.DENTAL FLUOC.KIDS RATONA SIN FLUOR"
+                    >C.DENTAL FLUOC.KIDS RATONA SIN FLUOR</ng-option
+                  >
+                  <ng-option value="C.D T.ACCION MAX AHORR."
+                    >C.D T.ACCION MAX AHORR.</ng-option
+                  >
+                  <ng-option value="C.DENTAL FLUOC. KIDS RATON SIN FLUOR"
+                    >C.DENTAL FLUOC. KIDS RATON SIN FLUOR</ng-option
+                  >
+                  <ng-option value="PREPACK CAJA TRIPLE ACCION MAX"
+                    >PREPACK CAJA TRIPLE ACCION MAX</ng-option
+                  >
+                  <ng-option value="DISPLAY CEPILLO KIDS"
+                    >DISPLAY CEPILLO KIDS</ng-option
+                  >
+                  <ng-option value="DISPLAY CEPILLO PREV. CARIES"
+                    >DISPLAY CEPILLO PREV. CARIES</ng-option
+                  >
+                  <ng-option value="CEPILLO FLUOC. PREVENCION CARIES"
+                    >CEPILLO FLUOC. PREVENCION CARIES</ng-option
+                  >
+                  <ng-option value="KIT ORAL FLUOC. ADULTO TRIPLE ACCION MAX"
+                    >KIT ORAL FLUOC. ADULTO TRIPLE ACCION MAX</ng-option
+                  >
+                  <ng-option value="CEPILLO FLUOCARDENT KIDS"
+                    >CEPILLO FLUOCARDENT KIDS</ng-option
+                  >
+                  <ng-option value="C.DENTAL PREV.CARIES AHORRAPACK"
+                    >C.DENTAL PREV.CARIES AHORRAPACK</ng-option
+                  >
+                  <ng-option value="BIPACK C.D T.ACCION MAX"
+                    >BIPACK C.D T.ACCION MAX</ng-option
+                  >
+                  <ng-option value="C.DENTAL T.ACCION MAX AHORR."
+                    >C.DENTAL T.ACCION MAX AHORR.</ng-option
+                  >
+                  <ng-option value="BIPACK FLUOC. SENSITIVE"
+                    >BIPACK FLUOC. SENSITIVE</ng-option
+                  >
+                  <ng-option value="OFTA T.A MAX GTIS T.A MAX"
+                    >OFTA T.A MAX GTIS T.A MAX</ng-option
+                  >
+                  <ng-option value="CEP. LIMP.MAX GTIS T.A MAX"
+                    >CEP. LIMP.MAX GTIS T.A MAX</ng-option
+                  >
+                  <ng-option value="T.A MAX GTS CEP.PREV.CARIES"
+                    >T.A MAX GTS CEP.PREV.CARIES</ng-option
+                  >
+                  <ng-option value="CD T.A MAX GTS CEP.LIMP.MAX"
+                    >CD T.A MAX GTS CEP.LIMP.MAX</ng-option
+                  >
+                </ng-select>
+
+                <input
+                  type="number"
+                  class="form-control"
+                  min="0"
+                  step="1"
+                  placeholder="Cantidad"
+                  [formControl]="getQuantityControl(i)"
+                  (input)="calculateTotal()"
+                  style="width: 80px"
+                />
+
+                <input
+                  type="number"
+                  class="form-control"
+                  min="0"
+                  step="100"
+                  placeholder="Precio"
+                  [formControl]="getPriceControl(i)"
+                  (input)="calculateTotal()"
+                  style="width: 120px"
+                />
+
+                <button
+                  type="button"
+                  class="btn btn-secondary ms-2"
+                  *ngIf="i === products.length - 1"
+                  (click)="addProduct()"
+                >
+                  Agregar
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger ms-2"
+                  *ngIf="products.length > 1"
+                  (click)="removeProduct(i)"
+                >
+                  ✖
+                </button>
+              </div>
+            </div>
+            <div class="form-floating mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="value"
+                placeholder="Total"
+                [value]="total"
+                readonly
+              />
+              <label for="value">Total</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="invoiceNumber"
+                placeholder="Valor"
+                formControlName="invoiceNumber"
+              />
+              <label for="invoiceNumber">Numero de factura</label>
+              @if(invoiceNumber?.invalid && (invoiceNumber?.dirty ||
+              invoiceNumber?.touched)) {
+              <span>Numero de factura es obligatorio</span> }
+            </div>
+            <div class="d-flex gap-3">
+              <a
+                class="btn btn-danger py-3 d-flex align-items-center justify-content-center flex-grow-1 fw-bold"
+                data-bs-toggle="modal"
+                data-bs-target="#reject"
+              >
+                Rechazar
+              </a>
+              <a
+                class="btn btn-yellow py-2 d-flex align-items-center justify-content-center flex-grow-1 fw-bold"
+                (click)="updateData('nextOne')"
+              >
+                Saltar
+              </a>
+              <a
+                class="btn btn-success py-2 d-flex align-items-center justify-content-center flex-grow-1 fw-bold"
+                data-bs-toggle="modal"
+                data-bs-target="#approve"
+              >
+                Aprobar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<div
+  class="modal fade"
+  id="reject"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  data-bs-theme="dark"
+  tabindex="-1"
+  aria-labelledby="rejectLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog modal-dialog-centered text-white">
     <div class="modal-content">
       <div class="modal-header">
@@ -335,7 +423,6 @@
     </div>
   </div>
 </div>
-
 <div
   class="modal fade"
   id="approve"
@@ -381,9 +468,41 @@
                   <td>{{ this.date?.value }}</td>
                 </tr>
                 <tr>
-                  <td>Producto</td>
-                  <td>{{ getSelectedProducts() }}</td>
+                  <td colspan="2">
+                    <strong>Productos</strong>
+                    <div class="table-responsive mt-2">
+                      <table class="table table-bordered text-white">
+                        <thead>
+                          <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            *ngFor="
+                              let item of products.controls;
+                              let i = index
+                            "
+                          >
+                            <td>{{ getProductControl(i).value }}</td>
+                            <td>{{ getQuantityControl(i).value }}</td>
+                            <td>{{ getPriceControl(i).value | currency }}</td>
+                            <td>
+                              {{
+                                (getQuantityControl(i).value || 0) *
+                                  (getPriceControl(i).value || 0) | currency
+                              }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
                 </tr>
+
                 <tr>
                   <td>Valor</td>
                   <td>{{ this.value?.value | currency }}</td>

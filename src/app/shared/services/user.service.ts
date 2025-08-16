@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -30,5 +31,13 @@ export class UserService {
   rejectInvoice(data: any) {
     return this.http.post(`${environment.apiUrl}/client/rejectionInvoice`, data);
   }
+
+  getPendingInvoicesCount(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/invoices/pending-count`);
+  }
+
+  awardPrizeByInvoice(id: number) {
+  return this.http.post(`${environment.apiUrl}/client/award-prize-by-invoice/${id}`, {});
+}
 
 }
