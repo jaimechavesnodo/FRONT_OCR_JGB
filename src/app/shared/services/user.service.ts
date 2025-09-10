@@ -40,4 +40,18 @@ export class UserService {
   return this.http.post(`${environment.apiUrl}/client/award-prize-by-invoice/${id}`, {});
 }
 
+rewardSelection(data: { clientId: number; rewardType: number }) {
+  return this.http.post(`${environment.apiUrl}/client/reward-selection`, data);
+}
+
+getClientPhone(idClient: number): Observable<{ phone: string | null }> {
+  return this.http.get<{ phone: string | null }>(`${environment.apiUrl}/client/phone/${idClient}`);
+}
+
+agentApproveInvoice(shoppingClientId: number): Observable<{ missingInvoices: number }> {
+  return this.http.post<{ missingInvoices: number }>(
+    `${environment.apiUrl}/client/agent-approve-invoice/${shoppingClientId}`, {}
+  );
+}
+
 }

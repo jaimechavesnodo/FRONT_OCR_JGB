@@ -2,10 +2,17 @@
 <main class="w-100 d-flex">
   <section class="section-container position-relative">
     <!-- Contenedor externo con scroll -->
+
+    <p style="text-align: center; margin-top: 10px; font-weight: bold">
+      Cliente:
+      {{ currentClientData?.nameClient || "Sin cliente" }} &nbsp;|&nbsp;
+      Teléfono: {{ clientPhone || "No disponible" }}
+    </p>
+
     <div
       style="
         width: 700px;
-        height: 620px;
+        height: 600px;
         overflow: auto;
         border: 13px solid #ccc;
         background-color: #fff;
@@ -62,6 +69,7 @@
       />
     </div>
   </section>
+
   <section
     class="section-container d-flex justify-content-center align-items-center"
   >
