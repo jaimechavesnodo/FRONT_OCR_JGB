@@ -40,6 +40,9 @@ export class HomeComponent implements OnInit {
     approve: false
   };
   currentClientData: any;
+  clientPhone: string | null = null;
+
+
 
   constructor(
     private userService: UserService,
@@ -176,10 +179,25 @@ loadPendingInvoicesCount() {
 }
 
 getAgentShopping() {
-  this.userService.getAgentShopping(this.user?.id).subscribe((response: any) => {
-    const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
-    console.log('📦 Respuesta de getAgentShopping:', parsedResponse);
-    this.currentClientData = parsedResponse;
+this.userService.getAgentShopping(this.user?.id).subscribe((response: any) => {
+  const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
+  //console.log('📦 Respuesta de getAgentShopping:', parsedResponse);
+  this.currentClientData = parsedResponse;
+
+  if (parsedResponse?.idClient) {
+  this.userService.getClientPhone(parsedResponse.idClient).subscribe({
+    next: (res) => {
+      this.clientPhone = res.phone;
+      //console.log('📞 Teléfono del cliente:', this.clientPhone);
+    },
+    error: (err) => {
+      console.error('Error al obtener teléfono del cliente', err);
+      this.clientPhone = null;
+    }
+  });
+} else {
+  this.clientPhone = null;
+}
 
     const nitLimpio = this.clearNit(parsedResponse?.nit);
 
@@ -260,22 +278,37 @@ updateData(type: 'approve' | 'reject' | 'nextOne') {
       const closeBtnModal = document.getElementById(type + 'Close');
       closeBtnModal?.click();
 
-      if (type === 'approve') {
+if (type === 'approve') {
   const shoppingClientId = this.currentClientData.id;
-  
-  this.userService.awardPrizeByInvoice(shoppingClientId).subscribe({
-    next: (awardResponse: any) => {
-      this.alertsService.success('Aprobado Exitosamente', 'Se ha aprobado la factura correctamente');
+
+  this.userService.agentApproveInvoice(shoppingClientId).subscribe({
+    next: (response) => {
+      const closeBtnModal = document.getElementById(type + 'Close');
+      closeBtnModal?.click();
+
+      const missing = response?.missingInvoices ?? 0;
+
+      if (missing === 0) {
+        this.alertsService.success(
+          '¡Factura Aprobada!',
+          '¡Listo! Ya puedes escribir PREMIO para reclamar tu recompensa.'
+        );
+      } else {
+        this.alertsService.success(
+          'Factura Aprobada',
+          `Te faltan ${missing} factura${missing > 1 ? 's' : ''} para poder reclamar el premio.`
+        );
+      }
+
       this.finalizeInvoiceProcess(type);
     },
-    error: (awardError) => {
-      // Si no se asigna premio por grupo incompleto, igual dar éxito en aprobación
-      //console.warn('Premio no asignado:', awardError.error?.message || awardError.message);
-      this.alertsService.success('Factura aprobada', this.generateMessage(type));
-      this.finalizeInvoiceProcess(type);
+    error: () => {
+      this.alertsService.error('Error', 'No se ha podido aprobar la factura, inténtalo de nuevo.');
     }
   });
 }
+
+
 
       if (type === 'reject') {
         this.userService.rejectInvoice({
