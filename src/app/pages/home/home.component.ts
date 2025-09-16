@@ -41,6 +41,7 @@ export class HomeComponent implements OnInit {
   };
   currentClientData: any;
   clientPhone: string | null = null;
+  invoiceCheckResult: string = '';
 
 
 
@@ -59,7 +60,7 @@ export class HomeComponent implements OnInit {
 get() {
   this.establishmentService.get().subscribe((response: any) => {
     this.establishments = response;
-    this.getAgentShopping(); // 👈 Ahora se llama aquí, cuando ya hay data
+    this.getAgentShopping(); 
   });
 }
   // Variables con las dimensiones originales de la imagen
@@ -426,7 +427,10 @@ getPriceControl(index: number): FormControl {
   get date() { return this.form.get('date'); }
   get product() { return this.form.get('product'); }
   get value() { return this.form.get('value'); }
-  get invoiceNumber() { return this.form.get('invoiceNumber'); }
+  get invoiceNumber(): FormControl {
+  return this.form.get('invoiceNumber') as FormControl;
+}
+
 
   // rotationAngle = 0;
   rotateImage() {
@@ -485,6 +489,27 @@ removeProduct(index: number) {
 getSelectedProducts(): string {
   return this.products.controls.map(p => p.get('product')?.value).join(', ');
 }
+
+checkIfInvoiceExists() {
+  const invoiceNumber = this.invoiceNumber?.value?.trim();
+
+  if (!invoiceNumber) {
+    this.invoiceCheckResult = '⚠️ Ingresa un número de factura.';
+    return;
+  }
+
+  this.userService.checkInvoiceExists(invoiceNumber).subscribe({
+    next: (res) => {
+      this.invoiceCheckResult = res.exists
+        ? '✅ Esta factura ya fue registrada en el sistema.'
+        : '❌ Esta factura aún no ha sido registrada.';
+    },
+    error: () => {
+      this.invoiceCheckResult = '❌ Ocurrió un error al verificar la factura.';
+    }
+  });
+}
+
 
 productList: { name: string }[] = [
   { name: 'Producto A' },

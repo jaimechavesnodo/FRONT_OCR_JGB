@@ -54,4 +54,11 @@ agentApproveInvoice(shoppingClientId: number): Observable<{ missingInvoices: num
   );
 }
 
+checkInvoiceExists(invoiceNumber: string): Observable<{ exists: boolean; code: number }> {
+  return this.http.get<{ exists: boolean; code: number }>(
+    `${environment.apiUrl}/client/invoice-exists/${invoiceNumber}`
+  );
+}
+
+
 }
