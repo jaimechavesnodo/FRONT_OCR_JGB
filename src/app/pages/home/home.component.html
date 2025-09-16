@@ -93,6 +93,41 @@
         </div>
         <div class="w-100 d-flex justify-content-center">
           <form class="w-75" [formGroup]="form">
+            <!-- ✅ Verificación de factura al principio -->
+            <div class="mb-3">
+              <label for="invoiceCheck" class="form-label fw-bold"
+                >Verificar número de factura</label
+              >
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="invoiceCheck"
+                  class="form-control"
+                  placeholder="Ingresa número de factura"
+                  [formControl]="invoiceNumber"
+                />
+                <button
+                  class="btn btn-outline-primary"
+                  type="button"
+                  (click)="checkIfInvoiceExists()"
+                >
+                  Verificar
+                </button>
+              </div>
+              <div class="mt-2">
+                <span
+                  *ngIf="invoiceCheckResult"
+                  [ngClass]="{
+                    'text-success': invoiceCheckResult.includes('✅'),
+                    'text-danger': invoiceCheckResult.includes('❌'),
+                    'text-warning': invoiceCheckResult.includes('⚠️')
+                  }"
+                >
+                  {{ invoiceCheckResult }}
+                </span>
+              </div>
+            </div>
+
             <div class="form-floating mb-3">
               <input
                 type="text"
@@ -333,9 +368,10 @@
                 formControlName="invoiceNumber"
               />
               <label for="invoiceNumber">Numero de factura</label>
-              @if(invoiceNumber?.invalid && (invoiceNumber?.dirty ||
-              invoiceNumber?.touched)) {
-              <span>Numero de factura es obligatorio</span> }
+              @if(invoiceNumber.invalid && (invoiceNumber.dirty ||
+              invoiceNumber.touched)) {
+              <span>Numero de factura es obligatorio</span>
+              }
             </div>
             <div class="d-flex gap-3">
               <a
